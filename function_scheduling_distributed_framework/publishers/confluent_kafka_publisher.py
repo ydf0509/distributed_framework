@@ -2,18 +2,34 @@
 # @Author  : ydf
 # @Time    : 2019/8/20 0008 12:12
 
-# noinspection PyPackageRequirements
+import os
+
+if os.name == 'nt':
+    """
+    为了保险起见，这样做一下,设置一下path，否则anaconda安装的python可能出现 ImportError: DLL load failed while importing cimpl: 找不到指定的模块。
+    多设置没事，少设置了才麻烦。
+    """
+    from pathlib import Path
+    import sys
+
+    # print(sys.executable)  #F:\minicondadir\Miniconda2\envs\py38\python.exe
+    # print(os.getenv('path'))
+    python_install_path = Path(sys.executable).parent.absolute()
+    kafka_libs_path = python_install_path / Path(r'.\Lib\site-packages\confluent_kafka.libs')
+    dlls_path = python_install_path / Path(r'.\DLLs')
+    library_bin_path = python_install_path / Path(r'.\Library\bin')
+    # print(library_bin_path)
+    path_env = os.getenv('path')
+    os.environ['path'] = f'''{path_env};{kafka_libs_path};{dlls_path};{library_bin_path};'''
+
 import atexit
-
-# noinspection PyPackageRequirements
 import time
-
 from kafka import KafkaProducer, KafkaAdminClient
 # noinspection PyPackageRequirements
 from kafka.admin import NewTopic
 # noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
-from confluent_kafka import Producer as ConfluentProducer
+
 
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
@@ -26,6 +42,7 @@ class ConfluentKafkaPublisher(AbstractPublisher, ):
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):
+        from confluent_kafka import Producer as ConfluentProducer
         self._producer = KafkaProducer(bootstrap_servers=frame_config.KAFKA_BOOTSTRAP_SERVERS)
         try:
             admin_client = KafkaAdminClient(bootstrap_servers=frame_config.KAFKA_BOOTSTRAP_SERVERS)

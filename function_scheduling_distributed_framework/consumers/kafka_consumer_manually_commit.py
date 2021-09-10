@@ -1,30 +1,36 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2021/4/18 0008 13:32
+
+
 import json
 from collections import defaultdict, OrderedDict
 # noinspection PyPackageRequirements
 import time
 
-from confluent_kafka.cimpl import TopicPartition
-from kafka import KafkaConsumer as OfficialKafkaConsumer, KafkaProducer, KafkaAdminClient
-from confluent_kafka import Consumer as ConfluentConsumer
+# noinspection PyPackageRequirements
+from kafka import KafkaProducer, KafkaAdminClient
+
+# noinspection PyPackageRequirements
 from kafka.admin import NewTopic
+# noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
 
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
-from nb_log import LogManager
 
 
 class KafkaConsumerManuallyCommit(AbstractConsumer):
     """
     confluent_kafla作为中间件实现的。操作kafka中间件的速度比kafka-python快10倍。
-    这个是手动确认，由于是异步在并发池中并发消费，可以防止强制关闭程序造成正在运行的任务丢失，比自动commit好。
+    这个是自动间隔2秒的手动确认，由于是异步在并发池中并发消费，可以防止强制关闭程序造成正在运行的任务丢失，比自动commit好。
+    如果使用kafka，推荐这个。
     """
     BROKER_KIND = 16
 
     def _shedual_task(self):
+
+        from confluent_kafka import Consumer as ConfluentConsumer  # 这个包不好安装，用户用这个中间件的时候自己再想办法安装。
         try:
             admin_client = KafkaAdminClient(bootstrap_servers=frame_config.KAFKA_BOOTSTRAP_SERVERS)
             admin_client.create_topics([NewTopic(self._queue_name, 10, 1)])
@@ -72,6 +78,7 @@ class KafkaConsumerManuallyCommit(AbstractConsumer):
         每隔2秒对1组offset，对连续消费状态是1的最大offset进行commit
         :return:
         """
+        from confluent_kafka.cimpl import TopicPartition  # 这个包不好安装，用户用这个中间件的时候自己再想办法安装。
         if time.time() - self._recent_commit_time > 2:
             partion_max_consumed_offset_map = dict()
             to_be_remove_from_partion_max_consumed_offset_map = defaultdict(list)
