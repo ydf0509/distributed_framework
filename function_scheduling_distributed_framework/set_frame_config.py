@@ -192,4 +192,4 @@ def auto_creat_config_file_to_project_root_path():
         f.write(config_file_content)
 
 
-use_config_form_distributed_frame_config_module()
+#use_config_form_distributed_frame_config_module()

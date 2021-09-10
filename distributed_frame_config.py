@@ -23,8 +23,8 @@ MONGO_CONNECT_URL = f'mongodb://192.168.6.132:27017/'
 # RABBITMQ_PORT = 5672
 # RABBITMQ_VIRTUAL_HOST = 'rabbitmq_virtual_host'
 # 
-REDIS_HOST = '127.0.0.1'
-REDIS_PASSWORD = ''
+REDIS_HOST = '192.168.2.254'
+REDIS_PASSWORD = '6HgjpHyTzeREdX46'
 REDIS_PORT = 6379
 REDIS_DB = 7
 # 
@@ -32,7 +32,7 @@ REDIS_DB = 7
 # NSQD_HTTP_CLIENT_HOST = '127.0.0.1'
 # NSQD_HTTP_CLIENT_PORT = 4151
 # 
-KAFKA_BOOTSTRAP_SERVERS = ['192.168.114.130:9092']
+KAFKA_BOOTSTRAP_SERVERS = ['192.168.2.251:9092']
 # KAFKA_BOOTSTRAP_SERVERS = ['192.168.6.130:9092']
 # 
 # SQLACHEMY_ENGINE_URL ='sqlite:////sqlachemy_queues/queues.db'
@@ -50,7 +50,7 @@ HTTPSQS_AUTH = '123456'
 
 # nb_log包的第几个日志模板，内置了8个模板，可以在你当前项目根目录下的nb_log_config.py文件扩展模板。第5个模板可以点击跳转到框架内部，但有点占控制台面积，第7个模板简单不可点击跳转到框架内部。
 NB_LOG_FORMATER_INDEX_FOR_CONSUMER_AND_PUBLISHER = 7
-# FSDF_DEVELOP_LOG_LEVEL = 50   # 开发时候的日志，进攻自己用，所以日志级别跳到最高
+FSDF_DEVELOP_LOG_LEVEL = 0   # 开发时候的日志，进攻自己用，所以日志级别跳到最高
 
-# TIMEZONE = 'Asia/Shanghai'          
+# TIMEZONE = 'Asia/Shanghai'
 
