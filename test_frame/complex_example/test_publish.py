@@ -5,7 +5,7 @@ import time
 
 from function_scheduling_distributed_framework import get_publisher
 
-pb = get_publisher('task1_queue', broker_kind=2)
+pb = get_publisher('task1_queue', broker_kind=BrokerEnum.REDIS_LIST)
 
 for i in range(100):
-    pb.publish({'x':i,'y':i * 2})
+    pb.publish({'x': i, 'y': i * 2})

@@ -47,7 +47,7 @@ class IdeAutoCompleteHelper(LoggerMixin):
 
        from function_scheduling_distributed_framework import task_deco, IdeAutoCompleteHelper
 
-       @task_deco('queue_test_f01', qps=2, broker_kind=3)
+       @task_deco('queue_test_f01', qps=2, broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
        def f(a, b):
            print(f'{a} + {b} = {a + b}')
 
@@ -105,7 +105,8 @@ class IdeAutoCompleteHelper(LoggerMixin):
 
 
 def task_deco(queue_name, *, function_timeout=0,
-              concurrent_num=50, specify_concurrent_pool=None, specify_async_loop=None, concurrent_mode=1,
+              concurrent_num=50, specify_concurrent_pool=None, specify_async_loop=None,
+              concurrent_mode: ConcurrentModeEnum = ConcurrentModeEnum.THREADING,
               max_retry_times=3, log_level=10, is_print_detail_exception=True, is_show_message_get_from_broker=False,
               qps: float = 0, is_using_distributed_frequency_control=False, msg_expire_senconds=0,
               is_send_consumer_hearbeat_to_redis=False,
@@ -114,7 +115,7 @@ def task_deco(queue_name, *, function_timeout=0,
               schedule_tasks_on_main_thread=False,
               function_result_status_persistance_conf=FunctionResultStatusPersistanceConfig(False, False, 7 * 24 * 3600),
               is_using_rpc_mode=False,
-              broker_kind: int = None):
+              broker_kind: BrokerEnum = None):
     """
     # 为了代码提示好，这里重复一次入参意义。被此装饰器装饰的函数f，函数f对象本身自动加了一些方法，例如f.push 、 f.consume等。
     :param queue_name: 队列名字。
@@ -169,7 +170,7 @@ def task_deco(queue_name, *, function_timeout=0,
 
     装饰器版，使用方式例如：
     '''
-    @task_deco('queue_test_f01', qps=0.2, broker_kind=2)
+    @task_deco('queue_test_f01', qps=0.2, broker_kind=BrokerEnum.REDIS_LIST)
     def f(a, b):
         print(a + b)
 
@@ -186,7 +187,7 @@ def task_deco(queue_name, *, function_timeout=0,
     def f(a, b):
         print(a + b)
 
-    consumer = get_consumer('queue_test_f01', consuming_function=f,qps=0.2, broker_kind=2)
+    consumer = get_consumer('queue_test_f01', consuming_function=f,qps=0.2, broker_kind=BrokerEnum.REDIS_LIST)
     # 需要手动指定consuming_function入参的值。
     for i in range(10, 20):
         consumer.publisher_of_same_queue.publish(dict(a=i, b=i * 2))
@@ -247,7 +248,7 @@ def run_consumer_with_multi_process(task_fun, process_num=1):
        from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum, run_consumer_with_multi_process
        import os
 
-       @task_deco('test_multi_process_queue',broker_kind=BrokerEnum.REDIS_ACK_ABLE,concurrent_mode=ConcurrentModeEnum.THREADING,)
+       @task_deco('test_multi_process_queue',broker_kind=BrokerEnum.REDIS_LIST_AND_SET,concurrent_mode=ConcurrentModeEnum.THREADING,)
        def fff(x):
            print(x * 10,os.getpid())
 

@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 import socket
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 
 
@@ -11,7 +11,7 @@ class UDPConsumer(AbstractConsumer, ):
     """
     socket 实现消息队列，不支持持久化，但不需要安装软件。
     """
-    BROKER_KIND = 21
+    BROKER_KIND = ConcurrentModeEnum.UDP
 
     BUFSIZE = 10240
 

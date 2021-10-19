@@ -3,11 +3,12 @@
 # @Time    : 2019/8/8 0008 14:57
 import time
 import threading
-from function_scheduling_distributed_framework import task_deco, BrokerEnum,ConcurrentModeEnum
+from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum
 
 t_start = time.time()
 
-@task_deco('queue_test2_qps', qps=2, broker_kind=BrokerEnum.PERSISTQUEUE,concurrent_mode=ConcurrentModeEnum.THREADING,concurrent_num=600 )
+
+@task_deco('queue_test2_qps', qps=2, broker_kind=BrokerEnum.PERSIST_QUEUE, concurrent_mode=ConcurrentModeEnum.THREADING, concurrent_num=600)
 def f2(a, b):
     """
     concurrent_num = 600 不用怕，因为这是智能线程池，如果函数耗时短，不会真开那么多线程。
@@ -25,7 +26,7 @@ def f2(a, b):
         sleep_time = 31
     if time.time() - t_start > 200:
         sleep_time = 79
-    if time.time() - t_start > 400: # 最后把函数耗时又减小，看看框架能不能自动缩小线程数量。
+    if time.time() - t_start > 400:  # 最后把函数耗时又减小，看看框架能不能自动缩小线程数量。
         sleep_time = 0.8
     if time.time() - t_start > 500:
         sleep_time = None
@@ -33,6 +34,7 @@ def f2(a, b):
     if sleep_time is not None:
         time.sleep(sleep_time)  # 模拟做某事需要阻塞n秒种，必须用并发绕过此阻塞。
     return result
+
 
 if __name__ == '__main__':
     f2.clear()

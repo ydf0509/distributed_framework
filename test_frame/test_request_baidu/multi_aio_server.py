@@ -13,6 +13,7 @@ def mk_socket(host="127.0.0.1", port=8000, reuseport=False):
     sock.bind((host, port))
     return sock
 
+
 async def handle(request):
     name = request.match_info.get('name', "Anonymous")
     pid = os.getpid()
@@ -21,9 +22,10 @@ async def handle(request):
     time.sleep(0.5)  # intentionally blocking sleep to simulate CPU load
     return web.Response(text=text)
 
+
 if __name__ == '__main__':
     host = "127.0.0.1"
-    port=8000
+    port = 8000
     reuseport = True
     app = web.Application()
     sock = mk_socket(host, port, reuseport=reuseport)
@@ -33,6 +35,6 @@ if __name__ == '__main__':
     coro = loop.create_server(
         protocol_factory=app.make_handler(),
         sock=sock,
-        )
+    )
     srv = loop.run_until_complete(coro)
     loop.run_forever()

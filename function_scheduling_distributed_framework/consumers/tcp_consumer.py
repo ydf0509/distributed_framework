@@ -4,7 +4,7 @@
 import json
 from threading import Thread
 import socket
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 
 
@@ -12,7 +12,7 @@ class TCPConsumer(AbstractConsumer, ):
     """
     socket 实现消息队列，不支持持久化，但不需要安装软件。
     """
-    BROKER_KIND = 22
+    BROKER_KIND = BrokerEnum.TCP
 
     BUFSIZE = 10240
 
@@ -33,7 +33,7 @@ class TCPConsumer(AbstractConsumer, ):
         self._server = server
         while True:
             tcp_cli_sock, addr = self._server.accept()
-            Thread(target=self.__handle_conn, args=(tcp_cli_sock,)).start() # 服务端多线程，可以同时处理多个tcp长链接客户端发来的消息。
+            Thread(target=self.__handle_conn, args=(tcp_cli_sock,)).start()  # 服务端多线程，可以同时处理多个tcp长链接客户端发来的消息。
 
     def __handle_conn(self, tcp_cli_sock):
         try:
@@ -56,4 +56,3 @@ class TCPConsumer(AbstractConsumer, ):
 
     def _requeue(self, kw):
         pass
-

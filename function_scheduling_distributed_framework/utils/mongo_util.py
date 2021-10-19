@@ -10,6 +10,7 @@ class MongoMixin:
     """
     mixin类被继承，也可以直接实例化。
     """
+
     @property
     @decorators.cached_method_result
     def mongo_client(self):

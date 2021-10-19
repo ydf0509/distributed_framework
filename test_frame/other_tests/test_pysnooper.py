@@ -9,8 +9,6 @@ import requests
 from function_scheduling_distributed_framework.utils import RedisMixin, pysnooper_ydf, LogManager
 
 
-
-
 def foo():
     raise TypeError('bad')
 

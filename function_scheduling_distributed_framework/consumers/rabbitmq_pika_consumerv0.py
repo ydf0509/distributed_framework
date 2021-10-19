@@ -8,7 +8,7 @@ from threading import Lock
 from function_scheduling_distributed_framework.publishers.base_publisher import deco_mq_conn_error
 import pikav0.exceptions
 from pikav0.exceptions import AMQPError
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from nb_log import LogManager, get_logger
 from function_scheduling_distributed_framework.utils.rabbitmq_factory import RabbitMqFactory
@@ -20,7 +20,7 @@ class RabbitmqConsumer(AbstractConsumer):
     """
     使用pika包实现的。
     """
-    BROKER_KIND = 0
+    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_AMQP_STORM
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

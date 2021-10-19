@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 # import time
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
 import paho.mqtt.client as mqtt
@@ -13,7 +13,7 @@ class MqttConsumer(AbstractConsumer):
     """
     emq 作为中间件 实现的消费者 ，使用共享订阅。
     """
-    BROKER_KIND = 17
+    BROKER_KIND = ConcurrentModeEnum.MQTT
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

@@ -56,17 +56,14 @@ if __name__ == '__main__':
 
     loopy = asyncio.get_event_loop()
     print(id(loopy))
-    tasks = []
-    tasks.append(simple_run_in_executor(requests.get, url='http://www.baidu.com', timeout=10))  # 同步变异步用法。
-
-    tasks.append(simple_run_in_executor(block_fun, 1))
-    tasks.append(simple_run_in_executor(block_fun, 2))
-    tasks.append(simple_run_in_executor(block_fun, 3))
-    tasks.append(simple_run_in_executor(time.sleep, 8))
-
-    tasks.append(enter_fun(4))
-    tasks.append(enter_fun(5))
-    tasks.append(enter_fun(6))
+    tasks = [simple_run_in_executor(requests.get, url='http://www.baidu.com', timeout=10),
+             simple_run_in_executor(block_fun, 1),
+             simple_run_in_executor(block_fun, 2),
+             simple_run_in_executor(block_fun, 3),
+             simple_run_in_executor(time.sleep, 8),
+             enter_fun(4),
+             enter_fun(5),
+             enter_fun(6)]
 
     print('开始')
     loopy.run_until_complete(asyncio.wait(tasks))

@@ -80,9 +80,6 @@ def my_run_job(job, jobstore_alias, run_times, logger_name):
     return events
 
 
-
-
-
 def patch_run_job():
     # from apscheduler.executors import base
     # base.run_job = my_run_job

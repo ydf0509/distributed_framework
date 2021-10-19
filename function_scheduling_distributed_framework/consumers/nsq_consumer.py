@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 from gnsq import Consumer, Message
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from nb_log import LogManager
@@ -15,7 +15,7 @@ class NsqConsumer(AbstractConsumer):
     """
     nsq作为中间件实现的。
     """
-    BROKER_KIND = 7
+    BROKER_KIND = ConcurrentModeEnum.NSQ
 
     def _shedual_task(self):
         consumer = Consumer(self._queue_name, 'frame_channel', frame_config.NSQD_TCP_ADDRESSES,
@@ -24,7 +24,7 @@ class NsqConsumer(AbstractConsumer):
         @consumer.on_message.connect
         def handler(consumerx: Consumer, message: Message):
             # 第一条消息不能并发，第一条消息之后可以并发。
-            self._print_message_get_from_broker('nsq',message.body.decode())
+            self._print_message_get_from_broker('nsq', message.body.decode())
             # self.logger.debug(f'从nsq的 [{self._queue_name}] 主题中 取出的消息是：  {message.body.decode()}')
             message.enable_async()
             kw = {'consumer': consumerx, 'message': message, 'body': json.loads(message.body)}

@@ -3,6 +3,7 @@
 # @Time    : 2021/4/3 0008 13:32
 import json
 import redis3
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.utils import RedisMixin, decorators
 
@@ -11,7 +12,7 @@ class RedisStreamConsumer(AbstractConsumer, RedisMixin):
     """
     redis 的 stream 结构 作为中间件实现的。需要redis 5.0以上，redis stream结构 是redis的消息队列，功能远超 list结构。
     """
-    BROKER_KIND = 12
+    BROKER_KIND = ConcurrentModeEnum.REDIS_STREAM
     GROUP = 'distributed_frame_group'
 
     def start_consuming_message(self):
@@ -19,7 +20,7 @@ class RedisStreamConsumer(AbstractConsumer, RedisMixin):
         # print(redis_server_info_dict)
         if float(redis_server_info_dict['redis_version'][0]) < 5:
             raise EnvironmentError('必须是5.0版本以上redis服务端才能支持  stream 数据结构，'
-                                   '请升级服务端，否则使用 REDIS_ACK_ABLE 方式使用redis 的 list 结构')
+                                   '请升级服务端，否则使用 REDIS_LIST_AND_SET 方式使用redis 的 list 结构')
         if self.redis_db_frame_version3.type(self._queue_name) == 'list':
             raise EnvironmentError(f'检测到已存在 {self._queue_name} 这个键，且类型是list， 必须换个队列名字或者删除这个 list 类型的键。'
                                    f'RedisStreamConsumer 使用的是 stream 数据结构')
@@ -38,7 +39,7 @@ class RedisStreamConsumer(AbstractConsumer, RedisMixin):
                                                               {self.queue_name: ">"}, count=100, block=60 * 1000)
             if results:
                 # self.logger.debug(f'从redis的 [{self._queue_name}] stream 中 取出的消息是：  {results}  ')
-                self._print_message_get_from_broker('redis',results)
+                self._print_message_get_from_broker('redis', results)
                 # print(results[0][1])
                 for msg_id, msg in results[0][1]:
                     kw = {'body': json.loads(msg['']), 'msg_id': msg_id}

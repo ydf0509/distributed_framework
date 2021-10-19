@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:31
 import json
 import rabbitpy
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.utils.rabbitmq_factory import RabbitMqFactory
 
@@ -12,7 +12,7 @@ class RabbitmqConsumerRabbitpy(AbstractConsumer):
     """
     使用rabbitpy实现的
     """
-    BROKER_KIND = 1
+    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_RABBIT_PY
 
     def _shedual_task(self):
         # noinspection PyTypeChecker

@@ -16,7 +16,7 @@ class RedisStreamPublisher(AbstractPublisher, RedisMixin):
         redis_server_info_dict = self.redis_db_frame_version3.info()
         if float(redis_server_info_dict['redis_version'][0]) < 5:
             raise EnvironmentError('必须是5.0版本以上redis服务端才能支持  stream 数据结构，'
-                                   '请升级服务端，否则使用 REDIS_ACK_ABLE 方式使用redis 的 list 结构')
+                                   '请升级服务端，否则使用 REDIS_LIST_AND_SET 方式使用redis 的 list 结构')
         if self.redis_db_frame_version3.type(self._queue_name) == 'list':
             raise EnvironmentError(f'检测到已存在 {self._queue_name} 这个键，且类型是list， 必须换个队列名字或者删除这个'
                                    f' list 类型的键。'

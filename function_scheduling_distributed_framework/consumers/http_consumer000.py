@@ -6,7 +6,7 @@ import io
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib import parse
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 
 
@@ -105,11 +105,12 @@ class HttpHandler(BaseHTTPRequestHandler):
         # 并不关闭仍被服务器使用 socket 。
         out.detach()
 
+
 class HTTPConsumer(AbstractConsumer, ):
     """
     http 实现消息队列，不支持持久化，但不需要安装软件。
     """
-    BROKER_KIND = 23
+    BROKER_KIND = BrokerEnum.HTTP
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

@@ -8,6 +8,7 @@
 """
 import json
 import time
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.consumers.confirm_mixin import ConsumerConfirmMixinWithTheHelpOfRedis, ConsumerConfirmMixinWithTheHelpOfRedisByHearbeat
 
@@ -18,7 +19,7 @@ class RedisConsumerAckAble000(ConsumerConfirmMixinWithTheHelpOfRedis, AbstractCo
     redis作为中间件实现的。将取出来的消息同时放入一个set中，代表unack消费状态。以支持对机器和python进程的随意关闭和断电。
     和celery的配置  task_reject_on_worker_lost = True task_acks_late = True后，处理逻辑几乎不约而同相似。
     """
-    BROKER_KIND = 9
+    BROKER_KIND = ConcurrentModeEnum.REDIS_LIST_AND_SET
 
     def _shedual_task(self):
         while True:
@@ -29,7 +30,7 @@ class RedisConsumerAckAble000(ConsumerConfirmMixinWithTheHelpOfRedis, AbstractCo
                 # 如果运行了第20行，但没运行下面这一行，仍然有极小概率会丢失1个任务。但比不做控制随意关停，丢失几百个线程你的redis任务强多了。
                 self._add_task_str_to_unack_zset(task_str, )
                 # self.logger.debug(f'从redis的 [{self._queue_name}] 队列中 取出的消息是：     {task_str}  ')
-                self._print_message_get_from_broker('reids',task_str)
+                self._print_message_get_from_broker('reids', task_str)
                 task_dict = json.loads(task_str)
                 kw = {'body': task_dict, 'task_str': task_str}
                 self._submit_task(kw)
@@ -54,7 +55,7 @@ class RedisConsumerAckAble111(ConsumerConfirmMixinWithTheHelpOfRedis, AbstractCo
     #
     # print(script_4(keys=["text_pipelien1","text_pipelien1b"]))
     """
-    BROKER_KIND = 9
+    BROKER_KIND = ConcurrentModeEnum.REDIS_LIST_AND_SET
 
     def _shedual_task(self):
         lua = '''
@@ -97,7 +98,7 @@ class RedisConsumerAckAble(ConsumerConfirmMixinWithTheHelpOfRedisByHearbeat, Abs
     #
     # print(script_4(keys=["text_pipelien1","text_pipelien1b"]))
     """
-    BROKER_KIND = 9
+    BROKER_KIND = ConcurrentModeEnum.REDIS_LIST_AND_SET
 
     def _shedual_task000(self):
         # 可以采用lua脚本，也可以采用redis的watch配合pipeline使用。比代码分两行pop和zadd比还能减少一次io交互，还能防止丢失小概率一个任务。

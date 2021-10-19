@@ -21,7 +21,6 @@ else:
         __metaclass__ = abc.ABCMeta
         __slots__ = ()
 
-
 if hasattr(os, 'PathLike'):
     PathLike = os.PathLike
 else:
@@ -36,23 +35,21 @@ else:
         @classmethod
         def __subclasshook__(cls, subclass):
             return (
-                hasattr(subclass, '__fspath__') or
-                # Make a concession for older `pathlib` versions:g
-                (hasattr(subclass, 'open') and
-                 'path' in subclass.__name__.lower())
+                    hasattr(subclass, '__fspath__') or
+                    # Make a concession for older `pathlib` versions:g
+                    (hasattr(subclass, 'open') and
+                     'path' in subclass.__name__.lower())
             )
-
 
 try:
     iscoroutinefunction = inspect.iscoroutinefunction
 except AttributeError:
-    iscoroutinefunction = lambda whatever: False # Lolz
+    iscoroutinefunction = lambda whatever: False  # Lolz
 
 try:
     isasyncgenfunction = inspect.isasyncgenfunction
 except AttributeError:
-    isasyncgenfunction = lambda whatever: False # Lolz
-
+    isasyncgenfunction = lambda whatever: False  # Lolz
 
 if PY3:
     string_types = (str,)
@@ -63,7 +60,7 @@ else:
 
 try:
     from collections import abc as collections_abc
-except ImportError: # Python 2.7
+except ImportError:  # Python 2.7
     import collections as collections_abc
 
 if sys.version_info[:2] >= (3, 6):
@@ -78,5 +75,3 @@ else:
         )
         assert len(result) == 15
         return result
-
-

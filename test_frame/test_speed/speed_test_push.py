@@ -9,7 +9,6 @@ redis_db_frame = redis.Redis(host=frame_config.REDIS_HOST, password=frame_config
 
 # f_test_speed.clear()
 for i in range(500000):
-
     f_test_speed.push(i)
     # redis_db_frame.lpush('no_frame_queue',f'{{"x":{i}}}')
 

@@ -3,8 +3,6 @@ import base64
 import copy
 import random
 import uuid
-
-from flask import request as flask_request
 # noinspection PyUnresolvedReferences
 from contextlib import contextmanager
 import functools
@@ -19,7 +17,7 @@ from functools import wraps
 # noinspection PyUnresolvedReferences
 import pysnooper
 from tomorrow3 import threads as tomorrow_threads
-
+from function_scheduling_distributed_framework.constant import ErrorDetailLevel
 from function_scheduling_distributed_framework.utils import LogManager, nb_print, LoggerMixin
 # noinspection PyUnresolvedReferences
 from function_scheduling_distributed_framework.utils.custom_pysnooper import _snoop_can_click, snoop_deco, patch_snooper_max_variable_length
@@ -55,16 +53,17 @@ def run_many_times(times=1):
 
 
 # noinspection PyIncorrectDocstring
-def handle_exception(retry_times=0, error_detail_level=0, is_throw_error=False, time_sleep=0):
+def handle_exception(retry_times=0, error_detail_level=ErrorDetailLevel.EXCEPTION_DEPTH_0,
+                     is_throw_error=False, time_sleep=0):
     """捕获函数错误的装饰器,重试并打印日志
     :param retry_times : 重试次数
-    :param error_detail_level :为0打印exception提示，为1打印3层深度的错误堆栈，为2打印所有深度层次的错误堆栈
+    :param error_detail_level : 打印错误信息的级别
     :param is_throw_error : 在达到最大次数时候是否重新抛出错误
-    :type error_detail_level: int
+    :type error_detail_level: ErrorDetailLevel
     """
 
-    if error_detail_level not in [0, 1, 2]:
-        raise Exception('error_detail_level参数必须设置为0 、1 、2')
+    if error_detail_level not in ErrorDetailLevel:
+        raise Exception('error_detail_level参数必须是有效的ErrorDetailLevel')
 
     def _handle_exception(func):
         @wraps(func)
@@ -79,11 +78,11 @@ def handle_exception(retry_times=0, error_detail_level=0, is_throw_error=False, 
 
                 except Exception as e:
                     error_info = ''
-                    if error_detail_level == 0:
+                    if error_detail_level == ErrorDetailLevel.EXCEPTION_DEPTH_0:
                         error_info = '错误类型是：' + str(e.__class__) + '  ' + str(e)
-                    elif error_detail_level == 1:
+                    elif error_detail_level == ErrorDetailLevel.EXCEPTION_DEPTH_3:
                         error_info = '错误类型是：' + str(e.__class__) + '  ' + traceback.format_exc(limit=3)
-                    elif error_detail_level == 2:
+                    elif error_detail_level == ErrorDetailLevel.EXCEPTION_DEPTH_ALL:
                         error_info = '错误类型是：' + str(e.__class__) + '  ' + traceback.format_exc()
 
                     handle_exception_log.exception(
@@ -622,6 +621,7 @@ def api_return_deco(v):
                 "data": data,
                 "message": "SUCCESS"}, ensure_ascii=False)
         except Exception as e:
+            from flask import request as flask_request
             except_str0 = f'请求路径：{flask_request.path}  请求参数：{json.dumps(flask_request.values.to_dict())} ,出错了 {type(e)} {e} {traceback.format_exc()}'.replace('\n', '<br>')
             flask_error_logger.exception(except_str0)
             exception_str_encode = base64.b64encode(except_str0.encode()).decode().replace('=', '').strip()
@@ -641,7 +641,7 @@ class _Test(unittest.TestCase):
         """测试多次运行和异常重试,测试装饰器叠加"""
 
         @run_many_times(3)
-        @handle_exception(2, 1)
+        @handle_exception(2, ErrorDetailLevel.EXCEPTION_DEPTH_3)
         def f():
             import json
             json.loads('a', ac='ds')

@@ -7,11 +7,9 @@ from function_scheduling_distributed_framework import get_consumer, get_publishe
 from function_scheduling_distributed_framework.consumers.redis_consumer import RedisConsumer
 from function_scheduling_distributed_framework.utils import LogManager
 
-
-
 logger = LogManager('complex_example').get_logger_and_add_handlers()
 
-pb2 = get_publisher('task2_queue', broker_kind=2)
+pb2 = get_publisher('task2_queue', broker_kind=BrokerEnum.REDIS_LIST)
 
 
 def task1(x, y):
@@ -27,7 +25,7 @@ def task2(n):
 
 
 def multi_processing_consume():
-    get_consumer('task1_queue', consuming_function=task1, broker_kind=2).start_consuming_message()
+    get_consumer('task1_queue', consuming_function=task1, broker_kind=BrokerEnum.REDIS_LIST).start_consuming_message()
     RedisConsumer('task2_queue', consuming_function=task2, threads_num=100).start_consuming_message()
     AbstractConsumer.join_shedual_task_thread()  # linux多进程启动时候一定要加这一句,否则即使是while 1 的线程如果不join，子进程也会迅速退出。windows下可以不需要这一句。
 

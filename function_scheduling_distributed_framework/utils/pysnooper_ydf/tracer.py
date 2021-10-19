@@ -15,9 +15,9 @@ import traceback
 
 from .variables import CommonVariable, Exploding, BaseVariable
 from . import utils, pycompat
+
 if pycompat.PY2:
     from io import open
-
 
 ipython_filename_pattern = re.compile('^<ipython-input-([0-9]+)-.*>$')
 
@@ -73,7 +73,7 @@ def get_path_and_source_from_frame(frame):
                 import IPython
                 ipython_shell = IPython.get_ipython()
                 ((_, _, source_chunk),) = ipython_shell.history_manager. \
-                                  get_range(0, entry_number, entry_number + 1)
+                    get_range(0, entry_number, entry_number + 1)
                 source = source_chunk.splitlines()
             except Exception:
                 pass
@@ -116,7 +116,7 @@ def get_write_function(output, overwrite):
     if output is None:
         def write(s):
             # stderr = sys.stderr
-            stderr = sys.stdout # REMIND 这行改了，out才能自定义颜色。
+            stderr = sys.stdout  # REMIND 这行改了，out才能自定义颜色。
             try:
                 stderr.write(s)
             except UnicodeEncodeError:
@@ -148,6 +148,7 @@ class FileWriter(object):
 
 thread_global = threading.local()
 DISABLED = bool(os.getenv('PYSNOOPER_DISABLED', ''))
+
 
 class Tracer:
     '''
@@ -200,18 +201,19 @@ class Tracer:
     You can also use `max_variable_length=None` to never truncate them.
 
     '''
+
     def __init__(self, output=None, watch=(), watch_explode=(), depth=1,
                  prefix='', overwrite=False, thread_info=False, custom_repr=(),
-                 max_variable_length=100,dont_effect_on_linux=True):
+                 max_variable_length=100, dont_effect_on_linux=True):
         self._write = get_write_function(output, overwrite)
 
         self.watch = [
-            v if isinstance(v, BaseVariable) else CommonVariable(v)
-            for v in utils.ensure_tuple(watch)
-         ] + [
-             v if isinstance(v, BaseVariable) else Exploding(v)
-             for v in utils.ensure_tuple(watch_explode)
-        ]
+                         v if isinstance(v, BaseVariable) else CommonVariable(v)
+                         for v in utils.ensure_tuple(watch)
+                     ] + [
+                         v if isinstance(v, BaseVariable) else Exploding(v)
+                         for v in utils.ensure_tuple(watch_explode)
+                     ]
         self.frame_to_local_reprs = {}
         self.depth = depth
 
@@ -223,14 +225,14 @@ class Tracer:
         self.target_frames = set()
         self.thread_local = threading.local()
         if len(custom_repr) == 2 and not all(isinstance(x,
-                      pycompat.collections_abc.Iterable) for x in custom_repr):
+                                                        pycompat.collections_abc.Iterable) for x in custom_repr):
             custom_repr = (custom_repr,)
         self.custom_repr = custom_repr
         self.last_source_path = None
         self.max_variable_length = max_variable_length
         if dont_effect_on_linux and os.name == 'posix':
             global DISABLED
-            DISABLED = True            # linux上装饰器自动失效，避免发到生产。
+            DISABLED = True  # linux上装饰器自动失效，避免发到生产。
         self.total_run_line = 0
 
     def __call__(self, function_or_class):
@@ -378,24 +380,23 @@ class Tracer:
         #                                                                     #
         old_local_reprs = self.frame_to_local_reprs.get(frame, {})
         self.frame_to_local_reprs[frame] = local_reprs = \
-                                       get_local_reprs(frame,
-                                                       watch=self.watch, custom_repr=self.custom_repr,
-                                                       max_length=self.max_variable_length)
+            get_local_reprs(frame,
+                            watch=self.watch, custom_repr=self.custom_repr,
+                            max_length=self.max_variable_length)
 
         newish_string = ('开始变量：。。。 ' if event == 'call' else
-                                                            '新变量：。。。 ')
+                         '新变量：。。。 ')
 
         for name, value_repr in local_reprs.items():
             if name not in old_local_reprs:
                 self.write('\033[0;34m{indent}{newish_string}{name} = {value_repr}\033[0m'.format(
-                                                                       **locals()))
+                    **locals()))
             elif old_local_reprs[name] != value_repr:
                 self.write('\033[0;33m{indent}修改变量：。。。 {name} = {value_repr}\033[0m'.format(
-                                                                   **locals()))
+                    **locals()))
 
         #                                                                     #
         ### Finished newish and modified variables. ###########################
-
 
         ### Dealing with misplaced function definition: #######################
         #                                                                     #
@@ -438,7 +439,7 @@ class Tracer:
             """
             \033[0;94m{"".join(args)}\033[0m
             """
-            self.total_run_line +=1
+            self.total_run_line += 1
             # self.write('{indent}{now_string} {event:9} '
             #            '{frame.f_lineno:4} {source_line}'.format(**locals()))
 
@@ -449,12 +450,12 @@ class Tracer:
 
             file_name_and_line2 = f'"{file_name_and_line}"'
             event_map = {
-                'call':'调用',
-                'line':'代码行',
+                'call': '调用',
+                'line': '代码行',
                 'return': '返回',
-                'exception':'异常',
+                'exception': '异常',
             }
-            event_cn = event_map.get(event,event)
+            event_cn = event_map.get(event, event)
 
             self.write(u'\033[0;32m{indent}{now_string} {thread_info} {event_cn:9} {file_name_and_line2:100} {source_line}\033[0m'.format(**locals()))
 

@@ -6,6 +6,7 @@ import json
 # import time
 import zmq
 import multiprocessing
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from nb_log import get_logger
 
@@ -63,7 +64,7 @@ class ZeroMqConsumer(AbstractConsumer):
     """
     zeromq 中间件的消费者，zeromq基于socket代码，不会持久化，且不需要安装软件。
     """
-    BROKER_KIND = 13
+    BROKER_KIND = ConcurrentModeEnum.ZERO_MQ
 
     def start_broker_queue_name_as_port(self):
         # threading.Thread(target=self._start_broker).start()
@@ -94,7 +95,7 @@ class ZeroMqConsumer(AbstractConsumer):
         while True:
             message = zsocket.recv()
             # self.logger.debug(f""" 从 zeromq 取出的消息是 {message}""")
-            self._print_message_get_from_broker('zeromq',message)
+            self._print_message_get_from_broker('zeromq', message)
             self._submit_task({'body': json.loads(message)})
             zsocket.send('recv ok'.encode())
 

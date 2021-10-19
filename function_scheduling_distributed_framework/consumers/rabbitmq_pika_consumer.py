@@ -8,26 +8,27 @@ from threading import Lock
 from nb_log import LogManager, get_logger
 
 from function_scheduling_distributed_framework.publishers.base_publisher import deco_mq_conn_error
-import pikav1.exceptions
-from pikav1.exceptions import AMQPError
-import pikav1
+import pika.exceptions
+from pika.exceptions import AMQPError
+import pika
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
 
-get_logger('pikav1', log_level_int=20)
+get_logger('pika', log_level_int=20)
 
 
 class RabbitmqConsumer(AbstractConsumer):
     """
     使用pika包实现的。
     """
-    BROKER_KIND = 4
+    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_PIKA
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):
         self._lock_for_pika = Lock()
-        self.logger.critical('pika 多线程中操作同一个 channel 有问题，如果使用 rabbitmq 建议设置中间件为 BrokerEnum.RABBITMQ_AMQPSTORM')
-        os._exit(444) # noqa
+        self.logger.critical('pika 多线程中操作同一个 channel 有问题，如果使用 rabbitmq 建议设置中间件为 BrokerEnum.RABBITMQ_AMQP_STORM')
+        os._exit(444)  # noqa
 
     def _shedual_task(self):
         # channel = RabbitMqFactory(is_use_rabbitpy=0).get_rabbit_cleint().creat_a_channel()
@@ -48,12 +49,12 @@ class RabbitmqConsumer(AbstractConsumer):
                 # self.rabbit_client = RabbitMqFactory(is_use_rabbitpy=0).get_rabbit_cleint()
                 # self.channel = self.rabbit_client.creat_a_channel()
 
-                credentials = pikav1.PlainCredentials(frame_config.RABBITMQ_USER, frame_config.RABBITMQ_PASS)
-                self.connection = pikav1.BlockingConnection(pikav1.ConnectionParameters(
+                credentials = pika.PlainCredentials(frame_config.RABBITMQ_USER, frame_config.RABBITMQ_PASS)
+                self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                     frame_config.RABBITMQ_HOST, frame_config.RABBITMQ_PORT, frame_config.RABBITMQ_VIRTUAL_HOST, credentials, heartbeat=600))
                 self.channel = self.connection.channel()
                 self.rabbitmq_queue = self.channel.queue_declare(queue=self._queue_name, durable=True)
-                self.channel.basic_consume(on_message_callback = callback,
+                self.channel.basic_consume(on_message_callback=callback,
                                            queue=self._queue_name,
                                            # no_ack=True
                                            )
@@ -62,12 +63,12 @@ class RabbitmqConsumer(AbstractConsumer):
             # except pikav0.exceptions.ConnectionClosedByBroker:
             #     break
             # Don't recover on channel errors
-            except pikav1.exceptions.AMQPChannelError as e:
+            except pika.exceptions.AMQPChannelError as e:
                 # break
                 self.logger.error(e)
                 continue
                 # Recover on all other connection errors
-            except pikav1.exceptions.AMQPConnectionError as e:
+            except pika.exceptions.AMQPConnectionError as e:
                 self.logger.error(e)
                 continue
 

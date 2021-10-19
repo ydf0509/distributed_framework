@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:36
 import json
 from queue import Queue
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.publishers import local_python_queue_publisher
 
@@ -12,7 +12,7 @@ class LocalPythonQueueConsumer(AbstractConsumer):
     """
     python 内置queue对象作为消息队列，这个要求发布和消费必须在同一python解释器内部运行，不支持分布式。
     """
-    BROKER_KIND = 3
+    BROKER_KIND = ConcurrentModeEnum.LOCAL_PYTHON_QUEUE
 
     @property
     def local_python_queue(self) -> Queue:
@@ -23,7 +23,7 @@ class LocalPythonQueueConsumer(AbstractConsumer):
             task = self.local_python_queue.get()
             if isinstance(task, str):
                 task = json.loads(task)
-            self._print_message_get_from_broker('当前python解释器内部',task)
+            self._print_message_get_from_broker('当前python解释器内部', task)
             # self.logger.debug(f'从当前python解释器内部的 [{self._queue_name}] 队列中 取出的消息是：  {json.dumps(task)}  ')
             kw = {'body': task}
             self._submit_task(kw)
@@ -33,4 +33,3 @@ class LocalPythonQueueConsumer(AbstractConsumer):
 
     def _requeue(self, kw):
         self.local_python_queue.put(kw['body'])
-

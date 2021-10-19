@@ -4,33 +4,14 @@
 import copy
 from typing import Callable
 
-from function_scheduling_distributed_framework.publishers.confluent_kafka_publisher import ConfluentKafkaPublisher
-from function_scheduling_distributed_framework.publishers.http_publisher import HTTPPublisher
-from function_scheduling_distributed_framework.publishers.kombu_publisher import KombuPublisher
-from function_scheduling_distributed_framework.publishers.redis_publisher_lpush import RedisPublisherLpush
-from function_scheduling_distributed_framework.publishers.tcp_publisher import TCPPublisher
-from function_scheduling_distributed_framework.publishers.udp_publisher import UDPPublisher
-from function_scheduling_distributed_framework.publishers.zeromq_publisher import ZeroMqPublisher
-from function_scheduling_distributed_framework.publishers.kafka_publisher import KafkaPublisher
-from function_scheduling_distributed_framework.publishers.local_python_queue_publisher import LocalPythonQueuePublisher
-from function_scheduling_distributed_framework.publishers.mongomq_publisher import MongoMqPublisher
-from function_scheduling_distributed_framework.publishers.nsq_publisher import NsqPublisher
-from function_scheduling_distributed_framework.publishers.persist_queue_publisher import PersistQueuePublisher
-from function_scheduling_distributed_framework.publishers.rabbitmq_amqpstorm_publisher import RabbitmqPublisherUsingAmqpStorm
-from function_scheduling_distributed_framework.publishers.rabbitmq_pika_publisher import RabbitmqPublisher
-from function_scheduling_distributed_framework.publishers.rabbitmq_rabbitpy_publisher import RabbitmqPublisherUsingRabbitpy
-from function_scheduling_distributed_framework.publishers.redis_publisher import RedisPublisher
-from function_scheduling_distributed_framework.publishers.rocketmq_publisher import RocketmqPublisher
-from function_scheduling_distributed_framework.publishers.sqla_queue_publisher import SqlachemyQueuePublisher
-from function_scheduling_distributed_framework.publishers.redis_stream_publisher import RedisStreamPublisher
-from function_scheduling_distributed_framework.publishers.mqtt_publisher import MqttPublisher
-from function_scheduling_distributed_framework.publishers.httpsqs_publisher import HttpsqsPublisher
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
+from function_scheduling_distributed_framework.public.utils import import_string
 from function_scheduling_distributed_framework import frame_config
 
 
 def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file_handler=True,
                   clear_queue_within_init=False, is_add_publish_time=True, consuming_function: Callable = None,
-                  broker_kind: int = None):
+                  broker_kind: BrokerEnum = None):
     """
     :param queue_name:
     :param log_level_int:
@@ -46,32 +27,35 @@ def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file
 
     all_kwargs = copy.deepcopy(locals())
     all_kwargs.pop('broker_kind')
+
     broker_kind__publisher_type_map = {
-        0: RabbitmqPublisherUsingAmqpStorm,
-        1: RabbitmqPublisherUsingRabbitpy,
-        2: RedisPublisher,
-        3: LocalPythonQueuePublisher,
-        4: RabbitmqPublisher,
-        5: MongoMqPublisher,
-        6: PersistQueuePublisher,
-        7: NsqPublisher,
-        8: KafkaPublisher,
-        9: RedisPublisher,
-        10: SqlachemyQueuePublisher,
-        11: RocketmqPublisher,
-        12: RedisStreamPublisher,
-        13: ZeroMqPublisher,
-        14: RedisPublisherLpush,
-        15: KombuPublisher,
-        16: ConfluentKafkaPublisher,
-        17: MqttPublisher,
-        18: HttpsqsPublisher,
-        21: UDPPublisher,
-        22: TCPPublisher,
-        23: HTTPPublisher,
+        BrokerEnum.RABBITMQ_AMQP_STORM: 'rabbitmq_amqpstorm_publisher.RabbitmqPublisherUsingAmqpStorm',
+        BrokerEnum.RABBITMQ_RABBIT_PY: 'rabbitmq_rabbitpy_publisher.RabbitmqPublisherUsingRabbitpy',
+        BrokerEnum.REDIS_LIST: 'redis_publisher.RedisPublisher',
+        BrokerEnum.LOCAL_PYTHON_QUEUE: 'local_python_queue_publisher.LocalPythonQueuePublisher',
+        BrokerEnum.RABBITMQ_PIKA: 'rabbitmq_pika_publisher.RabbitmqPublisher',
+        BrokerEnum.MONGO_QUEUE: 'mongomq_publisher.MongoMqPublisher',
+        BrokerEnum.PERSIST_QUEUE: 'persist_queue_publisher.PersistQueuePublisher',
+        BrokerEnum.NSQ: 'nsq_publisher.NsqPublisher',
+        BrokerEnum.KAFLA_AUTO_COMMIT: 'kafka_publisher.KafkaPublisher',
+        BrokerEnum.REDIS_LIST_AND_SET: 'redis_publisher.RedisPublisher',
+        BrokerEnum.SQLACHEMY: 'sqla_queue_publisher.SqlachemyQueuePublisher',
+        BrokerEnum.ROCKETMQ: 'rocketmq_publisherRocketmqPublisher',
+        BrokerEnum.REDIS_STREAM: 'redis_stream_publisher.RedisStreamPublisher',
+        BrokerEnum.ZERO_MQ: 'zeromq_publisher.ZeroMqPublisher',
+        BrokerEnum.REDIS_DOUBLE_LIST: 'redis_publisher_lpush.RedisPublisherLpush',
+        BrokerEnum.KOMBU: 'kombu_publisher.KombuPublisher',
+        BrokerEnum.CONFLUENT_KAFKA: 'confluent_kafka_publisher.ConfluentKafkaPublisher',
+        BrokerEnum.MQTT: 'mqtt_publisher.MqttPublisher',
+        BrokerEnum.HTTP_SQS: 'httpsqs_publisher.HttpsqsPublisher',
+        BrokerEnum.UDP: 'udp_publisher.UDPPublisher',
+        BrokerEnum.TCP: 'tcp_publisher.TCPPublisher',
+        BrokerEnum.HTTP: 'http_publisher.HTTPPublisher',
     }
     if broker_kind is None:
         broker_kind = frame_config.DEFAULT_BROKER_KIND
     if broker_kind not in broker_kind__publisher_type_map:
         raise ValueError(f'设置的中间件种类数字不正确,你设置的值是 {broker_kind} ')
-    return broker_kind__publisher_type_map[broker_kind](**all_kwargs)
+    publisher_module_str = f'function_scheduling_distributed_framework.publishers.{broker_kind__publisher_type_map[broker_kind]}'
+    publisher = import_string(publisher_module_str)
+    return publisher(**all_kwargs)

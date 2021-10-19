@@ -36,7 +36,7 @@ t1 = time.time()
 from function_scheduling_distributed_framework import task_deco, BrokerEnum, IdeAutoCompleteHelper, PriorityConsumingControlConfig, run_consumer_with_multi_process
 
 
-@task_deco('test_queue', broker_kind=BrokerEnum.REDIS)
+@task_deco('test_queue', broker_kind=BrokerEnum.REDIS_LIST)
 def ff(x, y):
     import os
     time.sleep(10)
@@ -45,7 +45,7 @@ def ff(x, y):
 
 if __name__ == '__main__':
     # ff.publish()
-    ff.clear() # 清除
+    ff.clear()  # 清除
     for i in range(1000):
         ff.push(i, y=i * 2)
 

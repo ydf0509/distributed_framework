@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:30
 import json
 import amqpstorm
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.publishers.rabbitmq_amqpstorm_publisher import RabbitmqPublisherUsingAmqpStorm
 
@@ -12,14 +12,14 @@ class RabbitmqConsumerAmqpStorm(AbstractConsumer):
     """
     使用AmqpStorm实现的，多线程安全的，不用加锁。
     """
-    BROKER_KIND = 0
+    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_AMQP_STORM
 
     def _shedual_task(self):
         # noinspection PyTypeChecker
         def callback(amqpstorm_message: amqpstorm.Message):
             body = amqpstorm_message.body
             # self.logger.debug(f'从rabbitmq的 [{self._queue_name}] 队列中 取出的消息是：  {body}')
-            self._print_message_get_from_broker('rabbitmq',body)
+            self._print_message_get_from_broker('rabbitmq', body)
             body = json.loads(body)
             kw = {'amqpstorm_message': amqpstorm_message, 'body': body}
             self._submit_task(kw)
@@ -39,5 +39,3 @@ class RabbitmqConsumerAmqpStorm(AbstractConsumer):
 
     def _requeue(self, kw):
         kw['amqpstorm_message'].nack(requeue=True)
-
-

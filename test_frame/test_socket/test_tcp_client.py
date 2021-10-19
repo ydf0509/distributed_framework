@@ -20,7 +20,7 @@ tcpCliSock.connect(ADDR)
 #     print(data1.decode('utf-8'))
 # tcpCliSock.close()
 
-data1 ='heloo'
+data1 = 'heloo'
 tcpCliSock.send(data1.encode())
 data1 = tcpCliSock.recv(BUFSIZ)
 print(data1.decode('utf-8'))

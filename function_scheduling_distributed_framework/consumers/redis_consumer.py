@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 # import time
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.utils import RedisMixin
 
@@ -13,7 +13,7 @@ class RedisConsumer(AbstractConsumer, RedisMixin):
     redis作为中间件实现的，使用redis list 结构实现的。
     这个如果消费脚本在运行时候随意反复重启或者非正常关闭或者消费宕机，会丢失大批任务。高可靠需要用rabbitmq或者redis_ack_able或者redis_stream的中间件方式。
     """
-    BROKER_KIND = 2
+    BROKER_KIND = ConcurrentModeEnum.REDIS_LIST
 
     # noinspection DuplicatedCode
     def _shedual_task000(self):

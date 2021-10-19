@@ -3,6 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 import time
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.publishers.httpsqs_publisher import HttpsqsPublisher
 
@@ -11,7 +12,7 @@ class HttpsqsConsumer(AbstractConsumer):
     """
     httpsqs作为中间件
     """
-    BROKER_KIND = 18
+    BROKER_KIND = ConcurrentModeEnum.HTTP_SQS
 
     def custom_init(self):
         self.httpsqs_publisher = HttpsqsPublisher(self._queue_name)

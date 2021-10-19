@@ -10,12 +10,12 @@ import time
 
 # noinspection PyPackageRequirements
 from kafka import KafkaProducer, KafkaAdminClient
-
 # noinspection PyPackageRequirements
 from kafka.admin import NewTopic
 # noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
-
+from confluent_kafka.cimpl import TopicPartition  # 这个包不好安装，用户用这个中间件的时候自己再想办法安装。
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
 
@@ -26,7 +26,7 @@ class KafkaConsumerManuallyCommit(AbstractConsumer):
     这个是自动间隔2秒的手动确认，由于是异步在并发池中并发消费，可以防止强制关闭程序造成正在运行的任务丢失，比自动commit好。
     如果使用kafka，推荐这个。
     """
-    BROKER_KIND = 16
+    BROKER_KIND = ConcurrentModeEnum.CONFLUENT_KAFKA
 
     def _shedual_task(self):
 
@@ -78,7 +78,7 @@ class KafkaConsumerManuallyCommit(AbstractConsumer):
         每隔2秒对1组offset，对连续消费状态是1的最大offset进行commit
         :return:
         """
-        from confluent_kafka.cimpl import TopicPartition  # 这个包不好安装，用户用这个中间件的时候自己再想办法安装。
+
         if time.time() - self._recent_commit_time > 2:
             partion_max_consumed_offset_map = dict()
             to_be_remove_from_partion_max_consumed_offset_map = defaultdict(list)

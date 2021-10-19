@@ -10,7 +10,7 @@ http_pool = ObjectPool(object_type=HttpOperator, object_pool_size=100, object_in
                        max_idle_seconds=30)
 
 
-@task_deco('test_baidu', broker_kind=BrokerEnum.REDIS, log_level=20,is_print_detail_exception=False,concurrent_num=200)
+@task_deco('test_baidu', broker_kind=BrokerEnum.REDIS_LIST, log_level=20, is_print_detail_exception=False, concurrent_num=200)
 def request_url(url):
     with http_pool.get() as conn:
         r1 = conn.request_and_getresponse('GET', url)

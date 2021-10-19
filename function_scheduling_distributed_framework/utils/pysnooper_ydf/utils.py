@@ -6,6 +6,7 @@ import time
 import sys
 from .pycompat import ABC, string_types, collections_abc
 
+
 def _check_methods(C, *methods):
     mro = C.__mro__
     for method in methods:
@@ -31,13 +32,11 @@ class WritableStream(ABC):
         return NotImplemented
 
 
-
 file_reading_errors = (
     IOError,
     OSError,
-    ValueError # IronPython weirdness.
+    ValueError  # IronPython weirdness.
 )
-
 
 
 def shitcode(s):
@@ -78,13 +77,13 @@ def truncate(string, max_length):
 
 def ensure_tuple(x):
     if isinstance(x, collections_abc.Iterable) and \
-                                               not isinstance(x, string_types):
+            not isinstance(x, string_types):
         return tuple(x)
     else:
         return (x,)
 
 
-def nb_print( *args, sep=' ', end='\n', file=None):
+def nb_print(*args, sep=' ', end='\n', file=None):
     """
     超流弊的print补丁
     :param x:
@@ -97,5 +96,4 @@ def nb_print( *args, sep=' ', end='\n', file=None):
     # sys.stdout.write(f'"{__file__}:{sys._getframe().f_lineno}"    {x}\n')
     args = (str(arg) for arg in args)  # REMIND 防止是数字不能被join
     sys.stdout.write(f'"{file_name}:{line}"  {time.strftime("%H:%M:%S")}  \033[0;94m{"".join(args)}\033[0m\n')
-    sys.stdout.flush()# 36  93 96 94
-
+    sys.stdout.flush()  # 36  93 96 94

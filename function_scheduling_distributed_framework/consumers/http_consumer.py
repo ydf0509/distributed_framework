@@ -6,7 +6,7 @@ import json
 
 from aiohttp import web
 from aiohttp.web_request import Request
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 
 
@@ -14,7 +14,7 @@ class HTTPConsumer(AbstractConsumer, ):
     """
     http 实现消息队列，不支持持久化，但不需要安装软件。
     """
-    BROKER_KIND = 23
+    BROKER_KIND = BrokerEnum.HTTP
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

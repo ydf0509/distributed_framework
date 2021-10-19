@@ -5,7 +5,7 @@ import os
 import json
 import time
 import traceback
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.rocketmq_publisher import RocketmqPublisher
@@ -15,7 +15,7 @@ class RocketmqConsumer(AbstractConsumer):
     """
     安装
     """
-    BROKER_KIND = 11
+    BROKER_KIND = ConcurrentModeEnum.ROCKETMQ
 
     def _shedual_task(self):
         try:
@@ -32,7 +32,7 @@ class RocketmqConsumer(AbstractConsumer):
 
         def callback(rocketmq_msg):
             # self.logger.debug(f'从rocketmq的 [{self._queue_name}] 主题的queue_id {rocketmq_msg.queue_id} 中 取出的消息是：{rocketmq_msg.body}')
-            self._print_message_get_from_broker('rocketmq',rocketmq_msg.body)
+            self._print_message_get_from_broker('rocketmq', rocketmq_msg.body)
             kw = {'body': json.loads(rocketmq_msg.body), 'rocketmq_msg': rocketmq_msg}
             self._submit_task(kw)
 
@@ -47,6 +47,3 @@ class RocketmqConsumer(AbstractConsumer):
 
     def _requeue(self, kw):
         self._publisher.publish(kw['body'])
-
-
-

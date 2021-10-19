@@ -6,7 +6,7 @@ import time
 from function_scheduling_distributed_framework import task_deco, BrokerEnum
 
 
-@task_deco('test_rpc_queue', is_using_rpc_mode=True, broker_kind=BrokerEnum.REDIS_ACK_ABLE)
+@task_deco('test_rpc_queue', is_using_rpc_mode=True, broker_kind=BrokerEnum.REDIS_LIST_AND_SET)
 def add(a, b):
     return a + b
 

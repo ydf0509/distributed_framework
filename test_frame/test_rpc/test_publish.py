@@ -8,6 +8,5 @@ for i in range(100):
     async_result = add.push(i, i * 2)
     print(async_result.result)
 
-
-    async_result = add.publish(dict(a=i*10, b=i * 20),priority_control_config = PriorityConsumingControlConfig(is_using_rpc_mode=True))
+    async_result = add.publish(dict(a=i * 10, b=i * 20), priority_control_config=PriorityConsumingControlConfig(is_using_rpc_mode=True))
     print(async_result.status_and_result)

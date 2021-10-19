@@ -4,4 +4,5 @@ from function_scheduling_distributed_framework.beggar_version_implementation.beg
 def f(x):
     print(x)
 
-start_consuming_message('no_frame_queue',consume_function=f)
+
+start_consuming_message('no_frame_queue', consume_function=f)

@@ -7,7 +7,6 @@ from function_scheduling_distributed_framework import nb_print
 from function_scheduling_distributed_framework.utils.resource_monitoring import ResourceMonitor
 
 
-
 def test_monitor():
     while 1:
         monitor = ResourceMonitor().set_log_level(10)
@@ -32,4 +31,3 @@ if __name__ == '__main__':
     monitorx.start_build_info_loop_on_daemon_thread(5)
     while True:
         time.sleep(10)
-

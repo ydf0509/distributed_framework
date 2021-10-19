@@ -3,7 +3,7 @@
 # @Time    : 2019/8/8 0008 13:32
 import json
 # import time
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.utils import RedisMixin, decorators
 
@@ -13,7 +13,7 @@ class RedisBrpopLpushConsumer(AbstractConsumer, RedisMixin):
     redis作为中间件实现的，使用redis brpoplpush 实现的，并且使用心跳来解决 关闭/掉线 重新分发问题。
 
     """
-    BROKER_KIND = 14
+    BROKER_KIND = ConcurrentModeEnum.REDIS_DOUBLE_LIST
 
     def start_consuming_message(self):
         self._is_send_consumer_hearbeat_to_redis = True

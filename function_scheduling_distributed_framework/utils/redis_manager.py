@@ -63,4 +63,4 @@ class RedisMixin(object):
     @property
     @decorators.cached_method_result
     def redis_db_frame_version3(self):
-        return redis3.Redis(host=frame_config.REDIS_HOST, port=frame_config.REDIS_PORT, password=frame_config.REDIS_PASSWORD, db=frame_config.REDIS_DB,decode_responses=True)
+        return redis3.Redis(host=frame_config.REDIS_HOST, port=frame_config.REDIS_PORT, password=frame_config.REDIS_PASSWORD, db=frame_config.REDIS_DB, decode_responses=True)

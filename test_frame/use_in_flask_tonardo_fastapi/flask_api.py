@@ -17,7 +17,7 @@ app.config.update(
 mail = Mail(app)
 
 
-@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS)
+@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS_LIST)
 def send_email(msg):
     """
     演示一般性大部分任务，如果函数不需要使用app上下文
@@ -27,7 +27,7 @@ def send_email(msg):
     print(f'发送邮件  {msg}')
 
 
-@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS)
+@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS_LIST)
 def send_main_with_app_context(msg):
     """
     演示使用 flask_mail ，此包需要用到app上下文
@@ -38,7 +38,6 @@ def send_main_with_app_context(msg):
         # 这个Message类需要读取flask的配置里面邮件发件人等信息，由于发布和消费不是同一太机器或者进程，必须使用上下文才嫩知道邮件配置
         message = Message(subject='title', recipients=['367224698@qq.com'], body=msg)
         mail.send(message)
-
 
 
 #############################  如果你想再封装一点，就加个通用上下文装饰器开始  ################################
@@ -54,7 +53,7 @@ def your_app_context_deco(flask_appx: flask.Flask):
     return _deco
 
 
-@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS)
+@task_deco(queue_name='flask_test_queue', broker_kind=BrokerEnum.REDIS_LIST)
 @your_app_context_deco(app)
 def send_main_with_app_context2(msg):
     """
@@ -64,6 +63,7 @@ def send_main_with_app_context2(msg):
     """
     message = Message(subject='title', recipients=['367224698@qq.com'], body=msg)
     mail.send(message)
+
 
 #############################  如果你想再封装一点，就加个通用上下文装饰器结束  ################################
 

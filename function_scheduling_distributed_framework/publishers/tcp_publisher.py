@@ -2,6 +2,8 @@
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:12
 import socket
+
+from function_scheduling_distributed_framework import ConcurrentModeEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
 
@@ -10,7 +12,7 @@ class TCPPublisher(AbstractPublisher, ):
     使用tco作为中间件,不支持持久化，支持分布式
     """
 
-    BROKER_KIND = 21
+    BROKER_KIND = ConcurrentModeEnum.HTTP
 
     BUFSIZE = 10240
 
@@ -20,7 +22,7 @@ class TCPPublisher(AbstractPublisher, ):
         pass
 
     def concrete_realization_of_publish(self, msg):
-        if not hasattr(self,'_tcp_cli_sock'):
+        if not hasattr(self, '_tcp_cli_sock'):
             ip__port_str = self.queue_name.split(':')
             ip_port = (ip__port_str[0], int(ip__port_str[1]))
             tcp_cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

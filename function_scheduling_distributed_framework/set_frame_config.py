@@ -12,11 +12,9 @@ import re
 import importlib
 from pathlib import Path
 from shutil import copyfile
-from nb_log import nb_print,stderr_write,stdout_write
-from nb_log.monkey_print import is_main_process,only_print_on_main_process
+from nb_log import nb_print, stderr_write, stdout_write
+from nb_log.monkey_print import is_main_process, only_print_on_main_process
 from function_scheduling_distributed_framework import frame_config
-
-
 
 
 # noinspection PyPep8Naming
@@ -73,7 +71,6 @@ def show_frame_config():
                 only_print_on_main_process(f'{var_name}:                {var_value}')
 
 
-
 def use_config_form_distributed_frame_config_module():
     """
     自动读取配置。会优先读取启动脚本的目录的distributed_frame_config.py文件。没有则读取项目根目录下的distributed_frame_config.py
@@ -91,7 +88,7 @@ def use_config_form_distributed_frame_config_module():
     # sys.stdout.write(f'\033[0;33m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;30;43m{inspect_msg}\033[0m\n')
     # noinspection PyProtectedMember
     if is_main_process():
-        stdout_write( f'\033[0;93m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;93;100m{inspect_msg}\033[0m\n')
+        stdout_write(f'\033[0;93m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;93;100m{inspect_msg}\033[0m\n')
     try:
         # noinspection PyUnresolvedReferences
         # import distributed_frame_config
@@ -105,7 +102,6 @@ def use_config_form_distributed_frame_config_module():
         nb_print(
             f'''分布式函数调度框架检测到 你的项目根目录 {project_root_path} 和当前文件夹 {current_script_path}  下没有 distributed_frame_config.py 文件，\n\n''')
         auto_creat_config_file_to_project_root_path()
-
 
     show_frame_config()
 
@@ -130,11 +126,10 @@ def auto_creat_config_file_to_project_root_path():
         return  # 当没设置pythonpath时候，也不要在 /lib/python36.zip这样的地方创建配置文件。
 
     file_name = Path(sys.path[1]) / Path('distributed_frame_config.py')
-    copyfile(Path(__file__).absolute().parent / Path('frame_config.py'),file_name)
+    copyfile(Path(__file__).absolute().parent / Path('frame_config.py'), file_name)
     nb_print(f'在  {Path(sys.path[1])} 目录下自动生成了一个文件， 请查看或修改 \n "{file_name}:1" 文件')
     # with (file_name).open(mode='w', encoding='utf8') as f:
     #     nb_print(f'在 {file_name} 目录下自动生成了一个文件， 请查看或修改 \n "{file_name}:1" 文件')
     #     f.write(config_file_content)
 
-
-#use_config_form_distributed_frame_config_module()
+# use_config_form_distributed_frame_config_module()

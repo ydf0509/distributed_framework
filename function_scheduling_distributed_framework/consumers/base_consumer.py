@@ -32,8 +32,8 @@ import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor as ApschedulerThreadPoolExecutor
 from apscheduler.events import EVENT_JOB_MISSED
-
-from function_scheduling_distributed_framework.concurrent_pool.single_thread_executor import SoloExecutor
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
+from function_scheduling_distributed_framework.factories.pool_factory import get_pool, get_check_patch_func, get_timeout_deco
 from function_scheduling_distributed_framework.utils.apscheduler_monkey import patch_run_job as patch_apscheduler_run_job
 
 import pymongo
@@ -45,17 +45,9 @@ from nb_log import get_logger, LoggerLevelSetterMixin, LogManager, nb_print, Log
     LoggerMixinDefaultWithFileHandler, stdout_write, stderr_write, is_main_process, only_print_on_main_process
 # noinspection PyUnresolvedReferences
 from function_scheduling_distributed_framework.concurrent_pool.async_helper import simple_run_in_executor
-from function_scheduling_distributed_framework.concurrent_pool.async_pool_executor import AsyncPoolExecutor
 # noinspection PyUnresolvedReferences
 from function_scheduling_distributed_framework.concurrent_pool.bounded_threadpoolexcutor import \
     BoundedThreadPoolExecutor
-from function_scheduling_distributed_framework.concurrent_pool.custom_evenlet_pool_executor import evenlet_timeout_deco, \
-    check_evenlet_monkey_patch, CustomEventletPoolExecutor
-from function_scheduling_distributed_framework.concurrent_pool.custom_gevent_pool_executor import gevent_timeout_deco, \
-    GeventPoolExecutor, check_gevent_monkey_patch
-from function_scheduling_distributed_framework.concurrent_pool.custom_threadpool_executor import \
-    CustomThreadPoolExecutor, check_not_monkey
-# from function_scheduling_distributed_framework.concurrent_pool.concurrent_pool_with_multi_process import ConcurrentPoolWithProcess
 from function_scheduling_distributed_framework.consumers.redis_filter import RedisFilter, RedisImpermanencyFilter
 from function_scheduling_distributed_framework.factories.publisher_factotry import get_publisher
 from function_scheduling_distributed_framework.utils import decorators, time_util, RedisMixin
@@ -185,15 +177,15 @@ class ConsumersManager:
                 nb_print(t)
                 t.join()
         else:
-            if cls.global_concurrent_mode in [1, 4]:
+            if cls.global_concurrent_mode in [ConcurrentModeEnum.THREADING, ConcurrentModeEnum.ASYNC]:
                 for t in cls.schedulal_thread_to_be_join:
                     # nb_print(t)
                     t.join()
-            elif cls.global_concurrent_mode == 2:
+            elif cls.global_concurrent_mode == ConcurrentModeEnum.GEVENT:
                 # cls.logger.info()
                 # nb_print(cls.schedulal_thread_to_be_join)
                 gevent.joinall(cls.schedulal_thread_to_be_join, raise_error=True, )
-            elif cls.global_concurrent_mode == 3:
+            elif cls.global_concurrent_mode == ConcurrentModeEnum.EVENTLET:
                 for g in cls.schedulal_thread_to_be_join:
                     # eventlet.greenthread.GreenThread.
                     # nb_print(g)
@@ -210,15 +202,8 @@ class ConsumersManager:
         cls._has_show_conusmers_info = True
 
     @staticmethod
-    def get_concurrent_name_by_concurrent_mode(concurrent_mode):
-        if concurrent_mode == 1:
-            return 'thread'
-        elif concurrent_mode == 2:
-            return 'gevent'
-        elif concurrent_mode == 3:
-            return 'evenlet'
-        elif concurrent_mode == 4:
-            return 'async'
+    def get_concurrent_name_by_concurrent_mode(concurrent_mode: ConcurrentModeEnum):
+        return concurrent_mode.label
 
 
 class FunctionResultStatusPersistanceConfig(LoggerMixin):
@@ -271,7 +256,8 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
 
     # noinspection PyProtectedMember,PyUnresolvedReferences
     def __init__(self, queue_name, *, consuming_function: Callable = None, function_timeout=0, concurrent_num=50,
-                 specify_concurrent_pool=None, specify_async_loop=None, concurrent_mode=1,
+                 specify_concurrent_pool=None, specify_async_loop=None,
+                 concurrent_mode: ConcurrentModeEnum = ConcurrentModeEnum.THREADING,
                  max_retry_times=3, log_level=10, is_print_detail_exception=True, is_show_message_get_from_broker=False,
                  qps: float = 0, is_using_distributed_frequency_control=False,
                  msg_expire_senconds=0, is_send_consumer_hearbeat_to_redis=False,
@@ -292,7 +278,7 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         :param concurrent_num:并发数量，并发种类由concurrent_mode决定
         :param specify_concurrent_pool:使用指定的线程池/携程池，可以多个消费者共使用一个线程池，不为None时候。threads_num失效
         :param specify_async_loop:指定的async的loop循环，设置并发模式为async才能起作用。
-        :param concurrent_mode:并发模式，1线程 2gevent 3eventlet 4 asyncio
+        :param concurrent_mode:并发模式
         :param max_retry_times:
         :param log_level: # 这里是设置消费者 发布者日志级别的，如果不想看到很多的细节显示信息，可以设置为 20 (logging.INFO)。
         :param is_print_detail_exception:函数出错时候时候显示详细的错误堆栈，占用屏幕太多
@@ -382,10 +368,10 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         self._is_send_consumer_hearbeat_to_redis = is_send_consumer_hearbeat_to_redis or is_using_distributed_frequency_control
         self._msg_expire_senconds = msg_expire_senconds
 
-        if self._concurrent_mode not in (1, 2, 3, 4, 5):
+        if self._concurrent_mode not in ConcurrentModeEnum:
             raise ValueError('设置的并发模式不正确')
         self._concurrent_mode_dispatcher = ConcurrentModeDispatcher(self)
-        if self._concurrent_mode == 4:
+        if self._concurrent_mode == ConcurrentModeEnum.ASYNC:
             self._run = self._async_run  # 这里做了自动转化，使用async_run代替run
 
         self._logger_prefix = logger_prefix
@@ -453,12 +439,8 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         atexit.register(self.join_shedual_task_thread)
 
     def __check_monkey_patch(self):
-        if self._concurrent_mode == 2:
-            check_gevent_monkey_patch()
-        elif self._concurrent_mode == 3:
-            check_evenlet_monkey_patch()
-        else:
-            check_not_monkey()
+        check_patch_fun = get_check_patch_func()
+        check_patch_fun()
 
     @property
     @decorators.synchronized
@@ -554,11 +536,11 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
     def _get_concurrent_info(self):
         concurrent_info = ''
         '''  影响了日志长度和一丝丝性能。
-        if self._concurrent_mode == 1:
+        if self._concurrent_mode == ConcurrentModeEnum.THREADING:
             concurrent_info = f'[{threading.current_thread()}  {threading.active_count()}]'
-        elif self._concurrent_mode == 2:
+        elif self._concurrent_mode == ConcurrentModeEnum.GEVENT:
             concurrent_info = f'[{gevent.getcurrent()}  {threading.active_count()}]'
-        elif self._concurrent_mode == 3:
+        elif self._concurrent_mode == ConcurrentModeEnum.EVENTLET:
             # noinspection PyArgumentList
             concurrent_info = f'[{eventlet.getcurrent()}  {threading.active_count()}]'
         '''
@@ -935,13 +917,7 @@ class ConcurrentModeDispatcher(LoggerMixin):
     def __init__(self, consumerx: AbstractConsumer):
         self.consumer = consumerx
         self._concurrent_mode = self.consumer._concurrent_mode
-        self.timeout_deco = None
-        if self._concurrent_mode in (1, 5):
-            self.timeout_deco = decorators.timeout
-        elif self._concurrent_mode == 2:
-            self.timeout_deco = gevent_timeout_deco
-        elif self._concurrent_mode == 3:
-            self.timeout_deco = evenlet_timeout_deco
+        self.timeout_deco = get_timeout_deco(self._concurrent_mode)
         self.logger.warning(f'{self.consumer} 设置并发模式'
                             f'为{ConsumersManager.get_concurrent_name_by_concurrent_mode(self._concurrent_mode)}')
 
@@ -961,27 +937,14 @@ class ConcurrentModeDispatcher(LoggerMixin):
     def build_pool(self):
         if self.consumer._concurrent_pool is not None:
             return self.consumer._concurrent_pool
-
-        pool_type = None  # 是按照ThreadpoolExecutor写的三个鸭子类，公有方法名和功能写成完全一致，可以互相替换。
-        if self._concurrent_mode == 1:
-            pool_type = CustomThreadPoolExecutor
-            # pool_type = BoundedThreadPoolExecutor
-        elif self._concurrent_mode == 2:
-            pool_type = GeventPoolExecutor
-        elif self._concurrent_mode == 3:
-            pool_type = CustomEventletPoolExecutor
-        elif self._concurrent_mode == 4:
-            pool_type = AsyncPoolExecutor
-        elif self._concurrent_mode == 5:
-            pool_type = SoloExecutor
-        if self._concurrent_mode == 4:
-            self.consumer._concurrent_pool = self.consumer._specify_concurrent_pool if self.consumer._specify_concurrent_pool is not None else pool_type(
-                self.consumer._concurrent_num, loop=self.consumer._specify_async_loop)
+        if self.consumer._specify_concurrent_pool:
+            self.consumer._concurrent_pool = self.consumer._specify_concurrent_pool
         else:
-            # print(pool_type)
-            self.consumer._concurrent_pool = self.consumer._specify_concurrent_pool if self.consumer._specify_concurrent_pool is not None else pool_type(
-                self.consumer._concurrent_num)
-        # print(self._concurrent_mode,self.consumer._concurrent_pool)
+            kwargs = {}
+            if self._concurrent_mode == ConcurrentModeEnum.ASYNC:
+                kwargs.update(loop=self.consumer._specify_async_loop)
+            self.consumer._concurrent_pool = get_pool(self._concurrent_mode, self.consumer._concurrent_num, **kwargs)
+
         return self.consumer._concurrent_pool
 
     def schedulal_task_with_no_block(self):
@@ -990,21 +953,23 @@ class ConcurrentModeDispatcher(LoggerMixin):
             ConsumersManager.schedulal_thread_to_be_join.append(t)
             t.start()
         else:
-            if self._concurrent_mode in [1, 4, 5]:
+            if self._concurrent_mode in [ConcurrentModeEnum.THREADING,
+                                         ConcurrentModeEnum.ASYNC,
+                                         ConcurrentModeEnum.SINGLE_THREAD]:
                 t = Thread(target=self.consumer.keep_circulating(1)(self.consumer._shedual_task))
                 ConsumersManager.schedulal_thread_to_be_join.append(t)
                 t.start()
-            elif self._concurrent_mode == 2:
+            elif self._concurrent_mode == ConcurrentModeEnum.GEVENT:
                 g = gevent.spawn(self.consumer.keep_circulating(1)(self.consumer._shedual_task), )
                 ConsumersManager.schedulal_thread_to_be_join.append(g)
-            elif self._concurrent_mode == 3:
+            elif self._concurrent_mode == ConcurrentModeEnum.EVENTLET:
                 g = eventlet.spawn(self.consumer.keep_circulating(1)(self.consumer._shedual_task), )
                 ConsumersManager.schedulal_thread_to_be_join.append(g)
-            # elif self._concurrent_mode == 4:
+            # elif self._concurrent_mode == ConcurrentModeEnum.ASYNC:
             #     t = Thread(target=self.consumer.keep_circulating(1)(self.consumer._shedual_task))
             #     ConsumersManager.schedulal_thread_to_be_join.append(t)
             #     t.start()
-            # elif self._concurrent_mode ==5:
+            # elif self._concurrent_mode == ConcurrentModeEnum.SINGLE_THREAD:
 
 
 class DistributedConsumerStatistics(RedisMixin, LoggerMixinDefaultWithFileHandler):

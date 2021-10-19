@@ -8,7 +8,7 @@ from kafka import KafkaConsumer as OfficialKafkaConsumer, KafkaProducer, KafkaAd
 from kafka.admin import NewTopic
 # noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
-
+from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework import frame_config
 from nb_log import LogManager
@@ -20,7 +20,7 @@ class KafkaConsumer(AbstractConsumer):
     """
     kafla作为中间件实现的。
     """
-    BROKER_KIND = 8
+    BROKER_KIND = ConcurrentModeEnum.KAFLA_AUTO_COMMIT
 
     def _shedual_task(self):
         try:
