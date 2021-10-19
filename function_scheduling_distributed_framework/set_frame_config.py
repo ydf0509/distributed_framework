@@ -12,12 +12,81 @@ import re
 import importlib
 from pathlib import Path
 from shutil import copyfile
-from nb_log import nb_print,stderr_write,stdout_write
-from nb_log.monkey_print import is_main_process,only_print_on_main_process
+from nb_log import nb_print, stderr_write, stdout_write
+from nb_log.monkey_print import is_main_process, only_print_on_main_process
 from function_scheduling_distributed_framework import frame_config
+import typing
+from function_scheduling_distributed_framework.constant import BrokerEnum
+
+if typing.TYPE_CHECKING:
+    from typing import TypedDict
 
 
+    class RedisConfigDict(TypedDict):
+        host: str
+        port: int
+        password: str
+        db: int
 
+
+    class MongoConfigDict(TypedDict):
+        host: typing.Union[str, typing.List[str]]
+        username: str
+        password: str
+        db: str
+
+
+    class RabbitmqConfigDict(TypedDict):
+        host: str
+        port: int
+        user: str
+        passwd: str
+        vhost: str
+
+
+    class KafkaConfigDict(TypedDict):
+        bootstrap_servers: typing.List[str]
+
+
+class FrameConfig:
+
+    def set_base_config(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(frame_config, k, v)
+
+    def set_mongo_config(self, mongo_config: 'MongoConfigDict', default_broker=True):
+        host = mongo_config["host"]
+        if type(host) is list:
+            host = ','.join(mongo_config["host"])
+        mongo_connect_url = f'mongodb://{mongo_config["username"]}:{mongo_config["password"]}@{host}/{mongo_config["db"]}'
+        frame_config.MONGO_CONNECT_URL = mongo_connect_url
+        if default_broker:
+            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.MONGOMQ
+
+    def set_redis_config(self, redis_config: 'RedisConfigDict', default_broker=True):
+        frame_config.REDIS_DB = redis_config['db']
+        frame_config.REDIS_HOST = redis_config['host']
+        frame_config.REDIS_PORT = redis_config['port']
+        frame_config.REDIS_PASSWORD = redis_config['password']
+        if default_broker:
+            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.REDIS_STREAM
+
+    def set_kafka_config(self, kafka_config: 'KafkaConfigDict', default_broker=True):
+        frame_config.KAFKA_BOOTSTRAP_SERVERS = kafka_config['bootstrap_servers']
+        if default_broker:
+            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.KAFKA
+
+    def set_rabbitmq_config(self, rabbitmq_config: 'RabbitmqConfigDict', default_broker=True):
+        frame_config.RABBITMQ_HOST = rabbitmq_config['host']
+        frame_config.RABBITMQ_PORT = rabbitmq_config['port']
+        frame_config.RABBITMQ_USER = rabbitmq_config['user']
+        frame_config.RABBITMQ_PASS = rabbitmq_config['passwd']
+        frame_config.RABBITMQ_VIRTUAL_HOST = rabbitmq_config['vhost']
+        if default_broker:
+            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.RABBITMQ_AMQPSTORM
+
+    def set_default_logger(self, logger):
+        self.logger = logger
 
 # noinspection PyPep8Naming
 # 这是手动调用函数设置配置，框架会自动调用use_config_form_distributed_frame_config_module读当前取项目根目录下的distributed_frame_config.py，不需要嗲用这里
@@ -73,12 +142,12 @@ def show_frame_config():
                 only_print_on_main_process(f'{var_name}:                {var_value}')
 
 
-
 def use_config_form_distributed_frame_config_module():
     """
     自动读取配置。会优先读取启动脚本的目录的distributed_frame_config.py文件。没有则读取项目根目录下的distributed_frame_config.py
     :return:
     """
+    return
     current_script_path = sys.path[0].replace('\\', '/')
     project_root_path = sys.path[1].replace('\\', '/')
     inspect_msg = f"""
@@ -91,7 +160,7 @@ def use_config_form_distributed_frame_config_module():
     # sys.stdout.write(f'\033[0;33m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;30;43m{inspect_msg}\033[0m\n')
     # noinspection PyProtectedMember
     if is_main_process():
-        stdout_write( f'\033[0;93m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;93;100m{inspect_msg}\033[0m\n')
+        stdout_write(f'\033[0;93m{time.strftime("%H:%M:%S")}\033[0m  "{__file__}:{sys._getframe().f_lineno}"   \033[0;93;100m{inspect_msg}\033[0m\n')
     try:
         # noinspection PyUnresolvedReferences
         # import distributed_frame_config
@@ -105,7 +174,6 @@ def use_config_form_distributed_frame_config_module():
         nb_print(
             f'''分布式函数调度框架检测到 你的项目根目录 {project_root_path} 和当前文件夹 {current_script_path}  下没有 distributed_frame_config.py 文件，\n\n''')
         auto_creat_config_file_to_project_root_path()
-
 
     show_frame_config()
 
@@ -130,11 +198,10 @@ def auto_creat_config_file_to_project_root_path():
         return  # 当没设置pythonpath时候，也不要在 /lib/python36.zip这样的地方创建配置文件。
 
     file_name = Path(sys.path[1]) / Path('distributed_frame_config.py')
-    copyfile(Path(__file__).absolute().parent / Path('frame_config.py'),file_name)
+    copyfile(Path(__file__).absolute().parent / Path('frame_config.py'), file_name)
     nb_print(f'在  {Path(sys.path[1])} 目录下自动生成了一个文件， 请查看或修改 \n "{file_name}:1" 文件')
     # with (file_name).open(mode='w', encoding='utf8') as f:
     #     nb_print(f'在 {file_name} 目录下自动生成了一个文件， 请查看或修改 \n "{file_name}:1" 文件')
     #     f.write(config_file_content)
 
-
-#use_config_form_distributed_frame_config_module()
+# use_config_form_distributed_frame_config_module()

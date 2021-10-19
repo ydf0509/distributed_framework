@@ -11,7 +11,7 @@ import nb_log
 from fabric2 import Connection
 from function_scheduling_distributed_framework.utils.paramiko_util import ParamikoFolderUploader
 
-from function_scheduling_distributed_framework.set_frame_config import patch_frame_config, show_frame_config
+from function_scheduling_distributed_framework.set_frame_config import patch_frame_config, show_frame_config, FrameConfig
 # import frame_config
 from function_scheduling_distributed_framework.consumers.base_consumer import ExceptionForRequeue, ExceptionForRetry, \
     AbstractConsumer, ConsumersManager, FunctionResultStatusPersistanceConfig
@@ -25,9 +25,10 @@ from function_scheduling_distributed_framework.timing_job import fsdf_background
 from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 
 # 有的包默认没加handlers，原始的日志不漂亮且不可跳转不知道哪里发生的。这里把warnning级别以上的日志默认加上handlers。
-nb_log.get_logger(name=None, log_level_int=30, log_filename='pywarning.log')
+nb_log.get_logger(name=None, log_level_int=30, )
 
 logger = nb_log.get_logger('function_scheduling_distributed_framework')
+config = FrameConfig()
 
 
 class IdeAutoCompleteHelper(LoggerMixin):
