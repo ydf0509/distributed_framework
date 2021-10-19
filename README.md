@@ -17,6 +17,12 @@
 
 ### 1.0.2 [分布式函数调度框架github地址](https://github.com/ydf0509/distributed_framework)
 
+### 1.0.3 [分布式函数调度框架qq群](https://qm.qq.com/cgi-bin/qm/qr?k=unA_o_L3sv5yushJzYGUTAwSzZ7GhUhq&jump_from=webapi)
+现在新建一个qq群 189603256
+
+[点击加入 python万能分布式函数调度框架qq群](https://qm.qq.com/cgi-bin/qm/qr?k=unA_o_L3sv5yushJzYGUTAwSzZ7GhUhq&jump_from=webapi)
+
+
 ## 1.1 安装方式
 
 pip install function_scheduling_distributed_framework --upgrade
@@ -25,7 +31,11 @@ pip install function_scheduling_distributed_framework --upgrade
 
 ## 1.2 框架功能介绍
 
-分布式函数调度框架，支持5种并发模式，20种消息中间件，20种任务控制功能。
+分布式函数调度框架，支持5种并发模式，20+种消息中间件，20种任务控制功能。
+
+有了这个框架，用户再也无需亲自手写操作进程、线程、协程的并发的代码了。
+
+有了这个框架，用户再也无需亲自手写操作redis rabbitmq socket kafka 了。
 
 [![sgV2xP.png](https://z3.ax1x.com/2021/01/19/sgV2xP.png)](https://imgtu.com/i/sgV2xP)
 

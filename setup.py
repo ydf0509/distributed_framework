@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='function_scheduling_distributed_framework',  #
-    version=11.7,
+    version=12.1,
     description=(
         'function scheduling distributed framework,support threading,gevent,eventlet,asyncio concurrent,support all kinds of message queue,and has manay control way'
     ),
@@ -74,6 +74,7 @@ setup(
         'confluent_kafka>=1.7.0',
         'paho-mqtt',
         'fabric2==2.6.0'  #有的机器包rust错误， 这样做 curl https://sh.rustup.rs -sSf | sh
+        'aiohttp',
     ]
 )
 """
@@ -86,7 +87,7 @@ setup(
 python setup.py sdist upload -r pypi
 
 # python setup.py bdist_wheel
-python setup.py bdist_wheel & twine upload dist/function_scheduling_distributed_framework-11.7-py3-none-any.whl
+python setup.py bdist_wheel & twine upload dist/function_scheduling_distributed_framework-12.1-py3-none-any.whl
 python setup.py sdist & twine upload dist/function_scheduling_distributed_framework-10.9.tar.gz
 
 最快的下载方式，上传立即可安装。阿里云源同步官网pypi间隔要等很久。
