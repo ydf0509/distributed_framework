@@ -10,84 +10,11 @@ import re
 from nb_log import nb_print, stderr_write, stdout_write
 from nb_log.monkey_print import is_main_process, only_print_on_main_process
 from function_scheduling_distributed_framework import frame_config
-import typing
 from function_scheduling_distributed_framework.constant import BrokerEnum
 
-if typing.TYPE_CHECKING:
-    from typing import TypedDict
 
-
-    class RedisConfigDict(TypedDict):
-        host: str
-        port: int
-        password: str
-        db: int
-
-
-    class MongoConfigDict(TypedDict):
-        host: typing.Union[str, typing.List[str]]
-        username: str
-        password: str
-        db: str
-
-
-    class RabbitmqConfigDict(TypedDict):
-        host: str
-        port: int
-        user: str
-        passwd: str
-        vhost: str
-
-
-    class KafkaConfigDict(TypedDict):
-        bootstrap_servers: typing.List[str]
-
-
-class FrameConfig:
-    @staticmethod
-    def set_base_config(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(frame_config, k, v)
-
-    @staticmethod
-    def set_mongo_config(self, mongo_config: 'MongoConfigDict', default_broker=True):
-        host = mongo_config["host"]
-        if type(host) is list:
-            host = ','.join(mongo_config["host"])
-        mongo_connect_url = f'mongodb://{mongo_config["username"]}:{mongo_config["password"]}@{host}/{mongo_config["db"]}'
-        frame_config.MONGO_CONNECT_URL = mongo_connect_url
-        if default_broker:
-            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.MONGOMQ
-
-    @staticmethod
-    def set_redis_config(redis_config: 'RedisConfigDict', default_broker=True):
-        frame_config.REDIS_MQ_DB = redis_config['db']
-        frame_config.REDIS_HOST = redis_config['host']
-        frame_config.REDIS_PORT = redis_config['port']
-        frame_config.REDIS_PASSWORD = redis_config['password']
-        if default_broker:
-            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.REDIS_STREAM
-
-    @staticmethod
-    def set_kafka_config(kafka_config: 'KafkaConfigDict', default_broker=True):
-        frame_config.KAFKA_BOOTSTRAP_SERVERS = kafka_config['bootstrap_servers']
-        if default_broker:
-            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.KAFLA_AUTO_COMMIT
-
-    @staticmethod
-    def set_rabbitmq_config(self, rabbitmq_config: 'RabbitmqConfigDict', default_broker=True):
-        frame_config.RABBITMQ_HOST = rabbitmq_config['host']
-        frame_config.RABBITMQ_PORT = rabbitmq_config['port']
-        frame_config.RABBITMQ_USER = rabbitmq_config['user']
-        frame_config.RABBITMQ_PASS = rabbitmq_config['passwd']
-        frame_config.RABBITMQ_VIRTUAL_HOST = rabbitmq_config['vhost']
-        if default_broker:
-            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.RABBITMQ_AMQPSTORM
-
-
-# noinspection PyPep8Naming
-# 这是手动调用函数设置配置，框架会自动调用use_config_form_distributed_frame_config_module读当前取项目根目录下的distributed_frame_config.py，不需要嗲用这里
-def patch_frame_config(MONGO_CONNECT_URL: str = None,
+def patch_frame_config(DEFAULT_BROKER_KIND=BrokerEnum.PERSIST_QUEUE,
+                       MONGO_CONNECT_URL: str = None,
 
                        RABBITMQ_USER: str = None,
                        RABBITMQ_PASS: str = None,
@@ -98,26 +25,22 @@ def patch_frame_config(MONGO_CONNECT_URL: str = None,
                        REDIS_HOST: str = None,
                        REDIS_PASSWORD: str = None,
                        REDIS_PORT: int = None,
-                       REDIS_MQ_DB: int = None,
+                       REDIS_DB: int = None,
 
                        NSQD_TCP_ADDRESSES: list = None,
                        NSQD_HTTP_CLIENT_HOST: str = None,
                        NSQD_HTTP_CLIENT_PORT: int = None,
                        KAFKA_BOOTSTRAP_SERVERS: list = None,
 
-                       SQLACHEMY_ENGINE_URL='sqlite:////sqlachemy_queues/queues.db'
-
+                       SQLACHEMY_ENGINE_URL='sqlite:////sqlachemy_queues/queues.db',
+                       **kwargs
                        ):
-    """
-    对框架的配置使用猴子补丁的方式进行更改。利用了模块天然是单利的特性。格式参考frame_config.py
-    :return:
-    """
-    kw = copy.copy(locals())
-    for var_name, var_value in kw.items():
-        if var_value is not None:
-            setattr(frame_config, var_name, var_value)
-    nb_print('使用patch_frame_config 函数设置框架配置了。')
-    show_frame_config()
+        kw = copy.copy(locals())
+        for var_name, var_value in kw.items():
+            if var_value is not None:
+                setattr(frame_config, var_name, var_value)
+        nb_print('使用patch_frame_config 函数设置框架配置了。')
+        show_frame_config()
 
 
 def show_frame_config():

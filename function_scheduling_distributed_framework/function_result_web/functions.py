@@ -10,9 +10,7 @@ from flask import jsonify
 from function_scheduling_distributed_framework import nb_print
 from function_scheduling_distributed_framework.utils import time_util, decorators, LoggerMixin
 from function_scheduling_distributed_framework.utils.mongo_util import MongoMixin
-# from test_frame.my_patch_frame_config import do_patch_frame_config
-#
-# do_patch_frame_config()
+
 
 db = MongoMixin().mongo_db_task_status
 
