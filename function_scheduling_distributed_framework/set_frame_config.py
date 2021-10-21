@@ -72,7 +72,7 @@ class FrameConfig:
     def set_kafka_config(kafka_config: 'KafkaConfigDict', default_broker=True):
         frame_config.KAFKA_BOOTSTRAP_SERVERS = kafka_config['bootstrap_servers']
         if default_broker:
-            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.KAFKA
+            frame_config.DEFAULT_BROKER_KIND = BrokerEnum.KAFLA_AUTO_COMMIT
 
     @staticmethod
     def set_rabbitmq_config(self, rabbitmq_config: 'RabbitmqConfigDict', default_broker=True):

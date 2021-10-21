@@ -4,7 +4,8 @@
 import time
 from function_scheduling_distributed_framework.set_frame_config import FrameConfig
 from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum
-FrameConfig.set_redis_config(dict(host='192.168.2.254', port=6379, db=0, password="6HgjpHyTzeREdX46"))
+
+#FrameConfig.set_redis_config(dict(host='192.168.2.254', port=6379, db=0, password="6HgjpHyTzeREdX46"))
 
 
 @task_deco('test_cost_long_time_fun_queue2', broker_kind=BrokerEnum.REDIS_LIST_AND_SET, concurrent_num=5)
