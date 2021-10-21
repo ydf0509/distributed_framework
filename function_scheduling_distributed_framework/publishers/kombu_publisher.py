@@ -7,7 +7,7 @@ import json
 from kombu import Connection, Exchange, Queue, Consumer, Producer
 from kombu.transport.virtual.base import Channel
 from nb_log import LogManager
-
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher, deco_mq_conn_error
 from function_scheduling_distributed_framework import frame_config
 
@@ -41,6 +41,7 @@ class KombuPublisher(AbstractPublisher, ):
     """
     使用kombu作为中间件,这个能直接一次性支持很多种小众中间件，但性能很差，除非是分布式函数调度框架没实现的中间件种类用户才可以用这种，用户也可以自己对比性能。
     """
+    BROKER_KIND = BrokerEnum.KOMBU
 
     def custom_init(self):
         self._kombu_broker_url_prefix = frame_config.KOMBU_URL.split(":")[0]

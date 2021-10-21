@@ -1,7 +1,7 @@
 """
 测试redis无其他逻辑时候的性能
 """
-from redis3 import Redis
+from redis import Redis
 import decorator_libs
 import nb_log
 

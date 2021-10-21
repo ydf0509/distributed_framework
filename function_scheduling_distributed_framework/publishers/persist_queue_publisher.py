@@ -5,6 +5,7 @@ import json
 import sqlite3
 
 import persistqueue
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework.utils import LogManager
@@ -14,6 +15,7 @@ LogManager('persistqueue').get_logger_and_add_handlers(10)
 
 # noinspection PyProtectedMember
 class PersistQueuePublisher(AbstractPublisher):
+    BROKER_KIND = BrokerEnum.PERSIST_QUEUE
     """
     使用persistqueue实现的本地持久化队列。
     这个是本地持久化，支持本地多个启动的python脚本共享队列任务。与LocalPythonQueuePublisher相比，不会随着python解释器退出，导致任务丢失。

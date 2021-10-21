@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2021/4/3 0008 13:32
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework.utils import RedisMixin
 
 
 class RedisStreamPublisher(AbstractPublisher, RedisMixin):
+    BROKER_KIND = BrokerEnum.REDIS_STREAM
     """
     redis 的 stream 结构 作为中间件实现的。需要redis 5.0以上，redis stream结构 是redis的消息队列，功能远超 list结构。
     """

@@ -11,7 +11,7 @@ class PersistQueueConsumer(AbstractConsumer):
     """
     persist queue包实现的本地持久化消息队列。
     """
-    BROKER_KIND = ConcurrentModeEnum.PERSIST_QUEUE
+    BROKER_KIND = BrokerEnum.PERSIST_QUEUE
 
     def _shedual_task(self):
         pub = PersistQueuePublisher(self.queue_name)

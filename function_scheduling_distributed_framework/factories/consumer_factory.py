@@ -45,4 +45,4 @@ def get_consumer(*args, broker_kind: BrokerEnum = None, **kwargs):
         raise ValueError(f'设置的中间件种类数字不正确,你设置的值是 {broker_kind} ')
     consumer_module_str = f'function_scheduling_distributed_framework.consumers.{broker_kind__consumer_type_map[broker_kind]}'
     consumer = import_string(consumer_module_str)
-    return consumer[broker_kind](*args, **kwargs)
+    return consumer(*args, **kwargs)

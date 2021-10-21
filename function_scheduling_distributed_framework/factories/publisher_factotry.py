@@ -26,7 +26,6 @@ def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file
     """
 
     all_kwargs = copy.deepcopy(locals())
-    all_kwargs.pop('broker_kind')
 
     broker_kind__publisher_type_map = {
         BrokerEnum.RABBITMQ_AMQP_STORM: 'rabbitmq_amqpstorm_publisher.RabbitmqPublisherUsingAmqpStorm',
@@ -40,7 +39,7 @@ def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file
         BrokerEnum.KAFLA_AUTO_COMMIT: 'kafka_publisher.KafkaPublisher',
         BrokerEnum.REDIS_LIST_AND_SET: 'redis_publisher.RedisPublisher',
         BrokerEnum.SQLACHEMY: 'sqla_queue_publisher.SqlachemyQueuePublisher',
-        BrokerEnum.ROCKETMQ: 'rocketmq_publisherRocketmqPublisher',
+        BrokerEnum.ROCKETMQ: 'rocketmq_publisher.RocketmqPublisher',
         BrokerEnum.REDIS_STREAM: 'redis_stream_publisher.RedisStreamPublisher',
         BrokerEnum.ZERO_MQ: 'zeromq_publisher.ZeroMqPublisher',
         BrokerEnum.REDIS_DOUBLE_LIST: 'redis_publisher_lpush.RedisPublisherLpush',
@@ -59,3 +58,17 @@ def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file
     publisher_module_str = f'function_scheduling_distributed_framework.publishers.{broker_kind__publisher_type_map[broker_kind]}'
     publisher = import_string(publisher_module_str)
     return publisher(**all_kwargs)
+
+
+def get_conn_exception(broker_kind: BrokerEnum):
+    conn_exception__broker_kind_map = {
+        BrokerEnum.RABBITMQ_PIKA: 'pika.exceptions.AMQPError',
+        BrokerEnum.RABBITMQ_AMQP_STORM: 'amqpstorm.AMQPError',
+        BrokerEnum.KOMBU: 'kombu.exceptions.KombuError',
+        BrokerEnum.RABBITMQ_RABBIT_PY: 'rabbitpy.exceptions.AMQPException',
+    }
+    exception_str = conn_exception__broker_kind_map.get(broker_kind)
+    if exception_str:
+        exception = import_string(exception_str)
+        return exception
+    return None

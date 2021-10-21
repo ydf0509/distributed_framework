@@ -12,7 +12,7 @@ class RabbitmqConsumerRabbitpy(AbstractConsumer):
     """
     使用rabbitpy实现的
     """
-    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_RABBIT_PY
+    BROKER_KIND = BrokerEnum.RABBITMQ_RABBIT_PY
 
     def _shedual_task(self):
         # noinspection PyTypeChecker

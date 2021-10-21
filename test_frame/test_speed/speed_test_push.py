@@ -5,7 +5,7 @@ from function_scheduling_distributed_framework import frame_config
 
 from test_frame.test_speed.speed_test_consume import f_test_speed
 
-redis_db_frame = redis.Redis(host=frame_config.REDIS_HOST, password=frame_config.REDIS_PASSWORD, port=frame_config.REDIS_PORT, db=frame_config.REDIS_DB)
+redis_db_frame = redis.Redis(host=frame_config.REDIS_HOST, password=frame_config.REDIS_PASSWORD, port=frame_config.REDIS_PORT, db=frame_config.REDIS_MQ_DB)
 
 # f_test_speed.clear()
 for i in range(500000):

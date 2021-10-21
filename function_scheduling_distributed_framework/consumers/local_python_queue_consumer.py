@@ -12,7 +12,7 @@ class LocalPythonQueueConsumer(AbstractConsumer):
     """
     python 内置queue对象作为消息队列，这个要求发布和消费必须在同一python解释器内部运行，不支持分布式。
     """
-    BROKER_KIND = ConcurrentModeEnum.LOCAL_PYTHON_QUEUE
+    BROKER_KIND = BrokerEnum.LOCAL_PYTHON_QUEUE
 
     @property
     def local_python_queue(self) -> Queue:

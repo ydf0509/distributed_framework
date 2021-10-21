@@ -29,8 +29,8 @@ from kafka import KafkaProducer, KafkaAdminClient
 from kafka.admin import NewTopic
 # noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
-
-
+from confluent_kafka import Producer as ConfluentProducer
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
@@ -39,10 +39,11 @@ class ConfluentKafkaPublisher(AbstractPublisher, ):
     """
     使用kafka作为中间件，这个confluent_kafka包的性能远强于 kafka-pyhton
     """
+    BROKER_KIND = BrokerEnum.CONFLUENT_KAFKA
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):
-        from confluent_kafka import Producer as ConfluentProducer
+
         self._producer = KafkaProducer(bootstrap_servers=frame_config.KAFKA_BOOTSTRAP_SERVERS)
         try:
             admin_client = KafkaAdminClient(bootstrap_servers=frame_config.KAFKA_BOOTSTRAP_SERVERS)

@@ -4,11 +4,13 @@
 from threading import Lock
 from pika import BasicProperties
 import pika
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher, deco_mq_conn_error
 from function_scheduling_distributed_framework import frame_config
 
 
 class RabbitmqPublisher(AbstractPublisher):
+    BROKER_KIND = BrokerEnum.RABBITMQ_PIKA
     """
     使用pika实现的。
     """

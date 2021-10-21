@@ -20,7 +20,7 @@ class KafkaConsumer(AbstractConsumer):
     """
     kafla作为中间件实现的。
     """
-    BROKER_KIND = ConcurrentModeEnum.KAFLA_AUTO_COMMIT
+    BROKER_KIND = BrokerEnum.KAFLA_AUTO_COMMIT
 
     def _shedual_task(self):
         try:

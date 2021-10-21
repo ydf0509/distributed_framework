@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 11:51
-import pikav0 as pika
+import pika
 import rabbitpy
-from pikav0.adapters.blocking_connection import BlockingChannel
+from pika.adapters.blocking_connection import BlockingChannel
 
 from function_scheduling_distributed_framework import frame_config
 
@@ -51,7 +51,7 @@ class RabbitmqClientPika:
 
 
 class RabbitMqFactory:
-    def __init__(self, heartbeat=600, is_use_rabbitpy=0):
+    def __init__(self, heartbeat=600, is_use_rabbitpy=False):
         """
         :param heartbeat:
         :param is_use_rabbitpy: 为0使用pika，多线程不安全。为1使用rabbitpy，多线程安全的包。

@@ -3,7 +3,6 @@
 from function_scheduling_distributed_framework.constant import BrokerEnum
 
 '''
-你项目根目录下自动生成的 distributed_frame_config.py 文件中修改配置，会被自动读取到。
 此文件按需修改，例如你使用redis中间件作为消息队列，可以不用管rabbitmq mongodb kafka的配置。
 
 框架使用文档是 https://function-scheduling-distributed-framework.readthedocs.io/zh_CN/latest/
@@ -28,7 +27,8 @@ RABBITMQ_VIRTUAL_HOST = ''  # 这个是rabbitmq的虚拟子host需要用户自�
 REDIS_HOST = '127.0.0.1'
 REDIS_PASSWORD = ''
 REDIS_PORT = 6379
-REDIS_DB = 7
+REDIS_FILTER_DB = 6
+REDIS_MQ_DB = 7
 
 NSQD_TCP_ADDRESSES = []
 NSQD_HTTP_CLIENT_HOST = ''

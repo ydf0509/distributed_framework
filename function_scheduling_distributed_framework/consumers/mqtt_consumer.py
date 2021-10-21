@@ -13,7 +13,7 @@ class MqttConsumer(AbstractConsumer):
     """
     emq 作为中间件 实现的消费者 ，使用共享订阅。
     """
-    BROKER_KIND = ConcurrentModeEnum.MQTT
+    BROKER_KIND = BrokerEnum.MQTT
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

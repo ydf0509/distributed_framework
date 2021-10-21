@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:12
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework import frame_config
 
@@ -68,6 +69,7 @@ class MqttPublisher(AbstractPublisher, ):
     """
     使用 emq 作为中间件
     """
+    BROKER_KIND = BrokerEnum.MQTT
 
     def custom_init(self):
         client = mqtt.Client()

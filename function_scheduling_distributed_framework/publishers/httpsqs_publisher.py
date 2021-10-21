@@ -2,11 +2,13 @@
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:12
 import json
-from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
+import urllib3
 import http.client
 from urllib.parse import urlencode, quote
+from function_scheduling_distributed_framework.constant import BrokerEnum
+from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework import frame_config
-import urllib3
+
 
 """
 http://blog.zyan.cc/httpsqs/
@@ -17,6 +19,7 @@ class HttpsqsPublisher(AbstractPublisher):
     """
     使用httpsqs作为中间件
     """
+    BROKER_KIND = BrokerEnum.HTTP_SQS
 
     def custom_init(self):
         conn = http.client.HTTPConnection(host=frame_config.HTTPSQS_HOST, port=frame_config.HTTPSQS_PORT)

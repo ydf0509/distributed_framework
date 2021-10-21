@@ -349,9 +349,6 @@ pip install function_scheduling_distributed_framework --upgrade -i https://pypi.
 下面的2.2 是装饰器生成消费者的使用方式，这个是简洁一丝丝。
 
  ```python
-"""
-运行后悔自动在你的当前项目根目录下生成一个 distributed_frame_config.py 的文件，在里面修改写配置就好了，框架会自动读取这个文件的配置。
-"""
 import time
 
 from function_scheduling_distributed_framework import get_consumer

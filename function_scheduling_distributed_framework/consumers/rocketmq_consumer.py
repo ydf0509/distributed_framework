@@ -15,7 +15,7 @@ class RocketmqConsumer(AbstractConsumer):
     """
     安装
     """
-    BROKER_KIND = ConcurrentModeEnum.ROCKETMQ
+    BROKER_KIND = BrokerEnum.ROCKETMQ
 
     def _shedual_task(self):
         try:

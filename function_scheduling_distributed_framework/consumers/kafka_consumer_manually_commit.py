@@ -26,7 +26,7 @@ class KafkaConsumerManuallyCommit(AbstractConsumer):
     这个是自动间隔2秒的手动确认，由于是异步在并发池中并发消费，可以防止强制关闭程序造成正在运行的任务丢失，比自动commit好。
     如果使用kafka，推荐这个。
     """
-    BROKER_KIND = ConcurrentModeEnum.CONFLUENT_KAFKA
+    BROKER_KIND = BrokerEnum.CONFLUENT_KAFKA
 
     def _shedual_task(self):
 

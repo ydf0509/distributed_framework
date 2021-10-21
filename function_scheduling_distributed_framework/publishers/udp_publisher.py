@@ -2,15 +2,15 @@
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:12
 import socket
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
 
 class UDPPublisher(AbstractPublisher, ):
+    BROKER_KIND = BrokerEnum.UDP
     """
     使用udp作为中间件,不支持持久化，支持分布式
     """
-
-    BROKER_KIND = 22
 
     BUFSIZE = 10240
 

@@ -2,6 +2,7 @@
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:23
 import json
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.utils.dependency_packages.mongomq import MongoQueue
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework.utils import time_util
@@ -9,6 +10,8 @@ from function_scheduling_distributed_framework.utils.mongo_util import MongoMixi
 
 
 class MongoMqPublisher(AbstractPublisher, MongoMixin):
+    BROKER_KIND = BrokerEnum.MONGO_QUEUE
+
     # 使用mongo-queue包实现的基于mongodb的队列。 队列是一个col，自动存放在consume_queues库中。
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

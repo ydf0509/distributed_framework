@@ -12,13 +12,12 @@ import typing
 from functools import wraps
 from threading import Lock
 import datetime
-import amqpstorm
-from kombu.exceptions import KombuError
-from pika.exceptions import AMQPError as PikaAMQPError
 
 from nb_log import LoggerLevelSetterMixin, LogManager, LoggerMixin
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.utils import decorators, RedisMixin, time_util
 from function_scheduling_distributed_framework import frame_config
+from function_scheduling_distributed_framework.factories.publisher_factotry import get_conn_exception
 
 
 class RedisAsyncResult(RedisMixin):
@@ -148,9 +147,11 @@ class PublishParamsChecker(LoggerMixin):
 
 
 class AbstractPublisher(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
+    BROKER_KIND = None
 
     def __init__(self, queue_name, log_level_int=10, logger_prefix='', is_add_file_handler=True,
-                 clear_queue_within_init=False, is_add_publish_time=True, consuming_function: callable = None, ):
+                 clear_queue_within_init=False, is_add_publish_time=True,
+                 consuming_function: callable = None, broker_kind: BrokerEnum = None):
         """
         :param queue_name:
         :param log_level_int:
@@ -160,6 +161,7 @@ class AbstractPublisher(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         :param is_add_publish_time:是否添加发布时间，以后废弃，都添加。
         :param consuming_function:消费函数，为了做发布时候的函数入参校验用的，如果不传则不做发布任务的校验，
                例如add 函数接收x，y入参，你推送{"x":1,"z":3}就是不正确的，函数不接受z参数。
+        :param broker_kind:
         """
         self.queue_name = self._queue_name = queue_name
         if logger_prefix != '':
@@ -178,7 +180,7 @@ class AbstractPublisher(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         # self.rabbit_client = RabbitMqFactory(is_use_rabbitpy=is_use_rabbitpy).get_rabbit_cleint()
         # self.channel = self.rabbit_client.creat_a_channel()
         # self.queue = self.channel.queue_declare(queue=queue_name, durable=True)
-        self.has_init_broker = 0
+        self.has_init_broker = False
         self._lock_for_count = Lock()
         self._current_time = None
         self.count_per_minute = None
@@ -187,6 +189,8 @@ class AbstractPublisher(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         self.logger.info(f'{self.__class__} 被实例化了')
         self.publish_msg_num_total = 0
         self._is_add_publish_time = is_add_publish_time
+        if broker_kind:
+            self.BROKER_KIND = broker_kind
         self.__init_time = time.time()
         atexit.register(self._at_exit)
         if clear_queue_within_init:
@@ -297,15 +301,20 @@ def deco_mq_conn_error(f):
         if not self.has_init_broker:
             self.logger.warning(f'对象的方法 【{f.__name__}】 首次使用 进行初始化执行 init_broker 方法')
             self.init_broker()
-            self.has_init_broker = 1
+            self.has_init_broker = True
             return f(self, *args, **kwargs)
         # noinspection PyBroadException
+        conn_except = get_conn_exception(self.BROKER_KIND)
         try:
-            return f(self, *args, **kwargs)
-        except (PikaAMQPError, amqpstorm.AMQPError, KombuError) as e:  # except Exception as e:   # 现在装饰器用到了绝大多出地方，单个异常类型不行。ex
-            self.logger.error(f'中间件链接出错   ,方法 {f.__name__}  出错 ，{e}')
-            self.init_broker()
-            return f(self, *args, **kwargs)
+            if conn_except:
+                try:
+                    return f(self, *args, **kwargs)
+                except conn_except as e:  # except Exception as e:   # 现在装饰器用到了绝大多出地方，单个异常类型不行。ex
+                    self.logger.error(f'中间件链接出错,方法 {f.__name__}  出错 ，{e}')
+                    self.init_broker()
+                    return f(self, *args, **kwargs)
+            else:
+                return f(self, *args, **kwargs)
         except Exception as e:
             self.logger.critical(e, exc_info=True)
 

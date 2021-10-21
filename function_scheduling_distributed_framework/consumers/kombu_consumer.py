@@ -66,7 +66,7 @@ class KombuConsumer(AbstractConsumer, ):
     使用kombu作为中间件,这个能直接一次性支持很多种小众中间件，但性能很差，除非是分布式函数调度框架没实现的中间件种类用户才可以用这种，用户也可以自己对比性能。
     """
 
-    BROKER_KIND = ConcurrentModeEnum.KOMBU
+    BROKER_KIND = BrokerEnum.KOMBU
 
     def custom_init(self):
         self._middware_name = frame_config.KOMBU_URL.split(":")[0]

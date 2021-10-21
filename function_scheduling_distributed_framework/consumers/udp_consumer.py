@@ -11,7 +11,7 @@ class UDPConsumer(AbstractConsumer, ):
     """
     socket 实现消息队列，不支持持久化，但不需要安装软件。
     """
-    BROKER_KIND = ConcurrentModeEnum.UDP
+    BROKER_KIND = BrokerEnum.UDP
 
     BUFSIZE = 10240
 

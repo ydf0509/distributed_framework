@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 12:12
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework.utils import RedisMixin
 
 
 class RedisPublisher(AbstractPublisher, RedisMixin):
+    BROKER_KIND = BrokerEnum.REDIS_LIST
     """
     使用redis作为中间件
     """

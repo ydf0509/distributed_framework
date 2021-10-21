@@ -2,7 +2,7 @@
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 13:07
 from queue import Queue
-
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
 local_pyhton_queue_name__local_pyhton_queue_obj_map = dict()  # 使local queue和其他中间件完全一样的使用方式，使用映射保存队列的名字，使消费和发布通过队列名字能找到队列对象。
@@ -12,6 +12,7 @@ class LocalPythonQueuePublisher(AbstractPublisher):
     """
     使用python内置queue对象作为中间件。方便测试，每个中间件的消费者类是鸭子类，多态可以互相替换。
     """
+    BROKER_KIND = BrokerEnum.LOCAL_PYTHON_QUEUE
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

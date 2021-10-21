@@ -12,7 +12,7 @@ class HttpsqsConsumer(AbstractConsumer):
     """
     httpsqs作为中间件
     """
-    BROKER_KIND = ConcurrentModeEnum.HTTP_SQS
+    BROKER_KIND = BrokerEnum.HTTP_SQS
 
     def custom_init(self):
         self.httpsqs_publisher = HttpsqsPublisher(self._queue_name)

@@ -8,7 +8,7 @@ def import_string(dotted_path):
     Import a dotted module path and return the attribute/class designated by the
     last name in the path. Raise ImportError if the import failed.
     """
-    if not type(dotted_path) != str:
+    if type(dotted_path) != str:
         return dotted_path
 
     try:

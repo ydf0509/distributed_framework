@@ -12,7 +12,7 @@ class SqlachemyConsumer(AbstractConsumer):
     """
     sqlachemy实现的操作5种数据库模拟消息队列，支持消费确认。
     """
-    BROKER_KIND = ConcurrentModeEnum.SQLACHEMY
+    BROKER_KIND = BrokerEnum.SQLACHEMY
 
     def _shedual_task(self):
         self.queue = sqla_queue.SqlaQueue(self._queue_name, frame_config.SQLACHEMY_ENGINE_URL)

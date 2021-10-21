@@ -18,7 +18,7 @@ import redis
 from concurrent.futures import ThreadPoolExecutor
 from function_scheduling_distributed_framework import patch_print, frame_config
 
-redis_db_frame = redis.Redis(host=frame_config.REDIS_HOST, password=frame_config.REDIS_PASSWORD, port=frame_config.REDIS_PORT, db=frame_config.REDIS_DB)
+redis_db_frame = redis.Redis(host=frame_config.REDIS_HOST, password=frame_config.REDIS_PASSWORD, port=frame_config.REDIS_PORT, db=frame_config.REDIS_MQ_DB)
 
 
 class BeggarRedisConsumer:

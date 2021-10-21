@@ -12,7 +12,7 @@ class RabbitmqConsumerAmqpStorm(AbstractConsumer):
     """
     使用AmqpStorm实现的，多线程安全的，不用加锁。
     """
-    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_AMQP_STORM
+    BROKER_KIND = BrokerEnum.RABBITMQ_AMQP_STORM
 
     def _shedual_task(self):
         # noinspection PyTypeChecker

@@ -8,8 +8,8 @@ def get_pool(concurrent_mode, concurrent_num, **kwargs):
         ConcurrentModeEnum.THREADING: 'custom_threadpool_executor.CustomThreadPoolExecutor',
         ConcurrentModeEnum.GEVENT: 'custom_gevent_pool_executor.GeventPoolExecutor',
         ConcurrentModeEnum.EVENTLET: 'evenlet_timeout_deco.CustomEventletPoolExecutor',
-        ConcurrentModeEnum.ASYNC_POOL_EXECUTOR: 'async_pool_executor.AsyncPoolExecutor',
-        ConcurrentModeEnum.SOLO_EXECUTOR: 'single_thread_executor.SoloExecutor',
+        ConcurrentModeEnum.ASYNC: 'async_pool_executor.AsyncPoolExecutor',
+        ConcurrentModeEnum.SINGLE_THREAD: 'single_thread_executor.SoloExecutor',
     }
     pool_type_str = f'function_scheduling_distributed_framework.concurrent_pool.{concurrent_mode__pool_type_map[concurrent_mode]}'
     pool_type_cls = import_string(pool_type_str)
@@ -30,7 +30,7 @@ def get_check_patch_func(concurrent_mode):
 def get_timeout_deco(concurrent_mode: ConcurrentModeEnum):
     concurrent_mode__timeout_deco_map = {
         ConcurrentModeEnum.THREADING: decorators.timeout,
-        ConcurrentModeEnum.SOLO_EXECUTOR: decorators.timeout,
+        ConcurrentModeEnum.SINGLE_THREAD: decorators.timeout,
         ConcurrentModeEnum.GEVENT: 'custom_gevent_pool_executor.gevent_timeout_deco',
         ConcurrentModeEnum.EVENTLET: 'custom_evenlet_pool_executor.evenlet_timeout_deco',
     }

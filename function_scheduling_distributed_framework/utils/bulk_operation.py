@@ -216,7 +216,7 @@ class _Test(unittest.TestCase, LoggerMixin):
 
         with decorators.TimerContextManager():
             # r = redis.Redis(password='123456')
-            r = RedisMixin().redis_db0
+            r = RedisMixin().redis_db_frame
             redis_helper = RedisBulkWriteHelper(r, 200)
             # redis_helper = RedisBulkWriteHelper(r, 100)  # 放在外面可以
             for i in range(1003):

@@ -11,7 +11,7 @@ class MongoMqConsumer(AbstractConsumer, MongoMixin):
     """
     Mongo queue包实现的基于mongo的消息队列，支持消费确认。
     """
-    BROKER_KIND = ConcurrentModeEnum.MONGO_QUEUE
+    BROKER_KIND = BrokerEnum.MONGO_QUEUE
 
     def _shedual_task(self):
         mp = MongoMqPublisher(self.queue_name)

@@ -4,6 +4,7 @@
 
 from gnsq import Producer, NsqdHTTPClient
 from gnsq.errors import NSQHttpError
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework import frame_config
 
@@ -12,6 +13,7 @@ class NsqPublisher(AbstractPublisher, ):
     """
     使用nsq作为中间件
     """
+    BROKER_KIND = BrokerEnum.NSQ
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

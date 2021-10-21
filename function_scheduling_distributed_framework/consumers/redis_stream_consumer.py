@@ -2,7 +2,7 @@
 # @Author  : ydf
 # @Time    : 2021/4/3 0008 13:32
 import json
-import redis3
+import redis
 from function_scheduling_distributed_framework.constant import BrokerEnum, ConcurrentModeEnum
 from function_scheduling_distributed_framework.consumers.base_consumer import AbstractConsumer
 from function_scheduling_distributed_framework.utils import RedisMixin, decorators
@@ -12,7 +12,7 @@ class RedisStreamConsumer(AbstractConsumer, RedisMixin):
     """
     redis 的 stream 结构 作为中间件实现的。需要redis 5.0以上，redis stream结构 是redis的消息队列，功能远超 list结构。
     """
-    BROKER_KIND = ConcurrentModeEnum.REDIS_STREAM
+    BROKER_KIND = BrokerEnum.REDIS_STREAM
     GROUP = 'distributed_frame_group'
 
     def start_consuming_message(self):
@@ -31,7 +31,7 @@ class RedisStreamConsumer(AbstractConsumer, RedisMixin):
     def _shedual_task(self):
         try:
             self.redis_db_frame_version3.xgroup_create(self._queue_name, self.GROUP, id=0, mkstream=True)
-        except redis3.exceptions.ResponseError as e:
+        except redis.exceptions.ResponseError as e:
             self.logger.info(e)  # BUSYGROUP Consumer Group name already exists  不能重复创建消费者组。
         while True:
             # redis服务端必须是5.0以上，并且确保这个键的类型是stream不能是list数据结构。

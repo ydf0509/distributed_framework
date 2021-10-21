@@ -13,9 +13,9 @@ import datetime
 import os
 from functools import wraps
 import decorator
-import pysnooper  # 需要安装 pip install pysnooper==0.0.11
-from pysnooper.pysnooper import get_write_function
-from pysnooper.tracer import Tracer, get_local_reprs, get_source_from_frame
+import pysnooper
+from pysnooper.tracer import get_write_function
+from pysnooper.tracer import Tracer, get_local_reprs, get_path_and_source_from_frame
 
 os_name = os.name
 
@@ -68,7 +68,8 @@ class TracerCanClick(Tracer):
                 **locals()))
 
         now_string = datetime.datetime.now().time().isoformat()
-        source_line = get_source_from_frame(frame)[frame.f_lineno - 1]
+        file_name, source = get_path_and_source_from_frame(frame)
+        source_line = source[frame.f_lineno - 1]
         # print(frame)
         # print(dir(frame.f_code))
         # print(frame.f_code.co_filename)
@@ -84,7 +85,7 @@ class TracerCanClick(Tracer):
 
 
 def _snoop_can_click(output=None, variables=(), depth=1, prefix=''):
-    write = get_write_function(output)
+    write = get_write_function(output, False)
 
     # noinspection PyShadowingBuiltins
     @decorator.decorator

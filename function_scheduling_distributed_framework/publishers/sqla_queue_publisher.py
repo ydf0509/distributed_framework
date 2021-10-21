@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : ydf
 # @Time    : 2019/8/8 0008 13:05
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.utils import sqla_queue
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
@@ -8,6 +9,7 @@ from function_scheduling_distributed_framework.publishers.base_publisher import 
 
 # noinspection PyProtectedMember
 class SqlachemyQueuePublisher(AbstractPublisher):
+    BROKER_KIND = BrokerEnum.SQLACHEMY
     """
     使用Sqlachemy 操作数据库 ，实现的5种sql 数据库服务器作为 消息队列。包括sqlite mydql microsoftsqlserver postgre oracle
     这个是使用数据库表模拟的消息队列。这不是突发奇想一意孤行，很多包库都实现了这。

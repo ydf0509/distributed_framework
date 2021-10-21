@@ -13,7 +13,7 @@ class RedisBrpopLpushConsumer(AbstractConsumer, RedisMixin):
     redis作为中间件实现的，使用redis brpoplpush 实现的，并且使用心跳来解决 关闭/掉线 重新分发问题。
 
     """
-    BROKER_KIND = ConcurrentModeEnum.REDIS_DOUBLE_LIST
+    BROKER_KIND = BrokerEnum.REDIS_DOUBLE_LIST
 
     def start_consuming_message(self):
         self._is_send_consumer_hearbeat_to_redis = True

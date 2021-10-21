@@ -3,12 +3,13 @@
 # @Time    : 2019/8/8 0008 12:04
 import os
 import rabbitpy
-
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher, deco_mq_conn_error
 from function_scheduling_distributed_framework.utils.rabbitmq_factory import RabbitMqFactory
 
 
 class RabbitmqPublisherUsingRabbitpy(AbstractPublisher):
+    BROKER_KIND = BrokerEnum.RABBITMQ_RABBIT_PY
     """
     使用rabbitpy包实现的。
     """
@@ -16,7 +17,7 @@ class RabbitmqPublisherUsingRabbitpy(AbstractPublisher):
     # noinspection PyAttributeOutsideInit
     def init_broker(self):
         self.logger.warning(f'使用rabbitpy包 链接mq')
-        self.rabbit_client = RabbitMqFactory(is_use_rabbitpy=1).get_rabbit_cleint()
+        self.rabbit_client = RabbitMqFactory(is_use_rabbitpy=True).get_rabbit_cleint()
         self.channel = self.rabbit_client.creat_a_channel()
         self.queue = self.channel.queue_declare(queue=self._queue_name, durable=True)
         self.logger.critical('rabbitpy 快速发布 有问题会丢失大量任务，如果使用 rabbitmq 建议设置中间件为 BrokerEnum.RABBITMQ_AMQP_STORM')

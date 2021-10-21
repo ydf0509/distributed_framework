@@ -439,7 +439,7 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         atexit.register(self.join_shedual_task_thread)
 
     def __check_monkey_patch(self):
-        check_patch_fun = get_check_patch_func()
+        check_patch_fun = get_check_patch_func(self._concurrent_mode)
         check_patch_fun()
 
     @property
@@ -611,7 +611,7 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
             function_result_status.result = function_run(**function_only_params)
             if asyncio.iscoroutine(function_result_status.result):
                 self.logger.critical(f'异步的协程消费函数必须使用 async 并发模式并发,请设置 '
-                                     f'消费函数 {self.consuming_function.__name__} 的concurrent_mode 为 ConcurrentModeEnum.ASYNC 或 4')
+                                     f'消费函数 {self.consuming_function.__name__} 的concurrent_mode 为 ConcurrentModeEnum.ASYNC')
                 # noinspection PyProtectedMember,PyUnresolvedReferences
                 os._exit(4)
             function_result_status.success = True

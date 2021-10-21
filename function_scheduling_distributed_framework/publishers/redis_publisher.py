@@ -5,13 +5,14 @@ import time
 # noinspection PyUnresolvedReferences
 from queue import Queue, Empty
 from threading import Lock
-
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 from function_scheduling_distributed_framework.utils import RedisMixin, decorators
 
 
 class RedisPublisher(AbstractPublisher, RedisMixin):
+    BROKER_KIND = BrokerEnum.REDIS_LIST_AND_SET
     """
     使用redis作为中间件,这个是大幅优化了发布速度的方式。简单的发布是 redis_publisher_0000.py 中的代码方式。
     """

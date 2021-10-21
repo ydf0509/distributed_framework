@@ -11,7 +11,7 @@ from kafka import KafkaProducer, KafkaAdminClient
 from kafka.admin import NewTopic
 # noinspection PyPackageRequirements
 from kafka.errors import TopicAlreadyExistsError
-
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
@@ -20,6 +20,7 @@ class KafkaPublisher(AbstractPublisher, ):
     """
     使用kafka作为中间件
     """
+    BROKER_KIND = BrokerEnum.KAFLA_AUTO_COMMIT
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):

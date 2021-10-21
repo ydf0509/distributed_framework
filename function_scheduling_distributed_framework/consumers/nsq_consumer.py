@@ -15,7 +15,7 @@ class NsqConsumer(AbstractConsumer):
     """
     nsq作为中间件实现的。
     """
-    BROKER_KIND = ConcurrentModeEnum.NSQ
+    BROKER_KIND = BrokerEnum.NSQ
 
     def _shedual_task(self):
         consumer = Consumer(self._queue_name, 'frame_channel', frame_config.NSQD_TCP_ADDRESSES,

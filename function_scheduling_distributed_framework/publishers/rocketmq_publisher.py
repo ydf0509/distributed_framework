@@ -3,12 +3,13 @@
 # @Time    : 2020/7/9 0008 12:12
 
 import time
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
-
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher
 
 
 class RocketmqPublisher(AbstractPublisher, ):
+    BROKER_KIND = BrokerEnum.ROCKETMQ
     group_id__rocketmq_producer = {}
 
     def custom_init(self):

@@ -4,11 +4,14 @@
 import amqpstorm
 from amqpstorm.basic import Basic as AmqpStormBasic
 from amqpstorm.queue import Queue as AmqpStormQueue
+from function_scheduling_distributed_framework.constant import BrokerEnum
 from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.publishers.base_publisher import AbstractPublisher, deco_mq_conn_error
 
 
 class RabbitmqPublisherUsingAmqpStorm(AbstractPublisher):
+    BROKER_KIND = BrokerEnum.RABBITMQ_AMQP_STORM
+
     # 使用amqpstorm包实现的mq操作。
     # 实例属性没在init里面写，造成补全很麻烦，写在这里做类属性，方便pycharm补全
     connection = amqpstorm.UriConnection

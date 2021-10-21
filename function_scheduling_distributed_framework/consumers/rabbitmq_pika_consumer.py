@@ -22,7 +22,7 @@ class RabbitmqConsumer(AbstractConsumer):
     """
     使用pika包实现的。
     """
-    BROKER_KIND = ConcurrentModeEnum.RABBITMQ_PIKA
+    BROKER_KIND = BrokerEnum.RABBITMQ_PIKA
 
     # noinspection PyAttributeOutsideInit
     def custom_init(self):
