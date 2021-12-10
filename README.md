@@ -70,7 +70,7 @@ pip install function_scheduling_distributed_framework --upgrade
 ```
 
 以下两种方式，都是10线程加python内存queue方式运行f函数，有了此框架，用户无需代码手写手动操作线程 协程 进程并发。
-![img_14.png](img_14.png)
+[![o5lEEq.png](https://s1.ax1x.com/2021/12/10/o5lEEq.png)](https://imgtu.com/i/o5lEEq)
 
 ### 1.2.2 框架支持20种中间件
 
