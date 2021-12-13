@@ -10,6 +10,7 @@ from function_scheduling_distributed_framework.publishers.kombu_publisher import
 from function_scheduling_distributed_framework.publishers.nats_publisher import NatsPublisher
 from function_scheduling_distributed_framework.publishers.redis_publisher_lpush import RedisPublisherLpush
 from function_scheduling_distributed_framework.publishers.tcp_publisher import TCPPublisher
+from function_scheduling_distributed_framework.publishers.txt_file_publisher import TxtFilePublisher
 from function_scheduling_distributed_framework.publishers.udp_publisher import UDPPublisher
 from function_scheduling_distributed_framework.publishers.zeromq_publisher import ZeroMqPublisher
 from function_scheduling_distributed_framework.publishers.kafka_publisher import KafkaPublisher
@@ -71,6 +72,7 @@ def get_publisher(queue_name, *, log_level_int=10, logger_prefix='', is_add_file
         22: TCPPublisher,
         23: HTTPPublisher,
         24: NatsPublisher,
+        25: TxtFilePublisher,
     }
     if broker_kind is None:
         broker_kind = frame_config.DEFAULT_BROKER_KIND

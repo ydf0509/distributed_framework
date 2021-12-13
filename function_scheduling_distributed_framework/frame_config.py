@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from function_scheduling_distributed_framework.constant import BrokerEnum
+
+'''
+此文件是第一次运行框架自动生成刀项目根目录的，不需要用由户手动创建。
+'''
 
 '''
 你项目根目录下自动生成的 distributed_frame_config.py 文件中修改配置，会被自动读取到。
@@ -43,6 +48,8 @@ SQLACHEMY_ENGINE_URL = 'sqlite:////sqlachemy_queues/queues.db'
 
 # persist_quque中间件时候采用本机sqlite的方式，数据库文件生成的位置。如果linux账号在根目录没权限建文件夹，可以换文件夹。
 SQLLITE_QUEUES_PATH = '/sqllite_queues'
+
+TXT_FILE_PATH = Path(__file__).parent /'txt_queues'
 
 ROCKETMQ_NAMESRV_ADDR = '192.168.199.202:9876'
 

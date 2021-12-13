@@ -9,17 +9,20 @@ import json
 import time
 from pathlib import Path
 
-import sqlalchemy
-from sqlalchemy import Column, func, or_, and_, Table, MetaData
-from sqlalchemy import Integer
-from sqlalchemy import String, DateTime
-from sqlalchemy import create_engine
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.pool import StaticPool
-from sqlalchemy_utils import database_exists, create_database
-from function_scheduling_distributed_framework.utils import  LoggerMixin, decorators, LoggerLevelSetterMixin
+try:
+    import sqlalchemy
+    from sqlalchemy import Column, func, or_, and_, Table, MetaData
+    from sqlalchemy import Integer
+    from sqlalchemy import String, DateTime
+    from sqlalchemy import create_engine
+    from sqlalchemy.ext.automap import automap_base
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker, scoped_session
+    from sqlalchemy.pool import StaticPool
+    from sqlalchemy_utils import database_exists, create_database
+except ImportError as e:
+    print(e)
+from function_scheduling_distributed_framework.utils import LoggerMixin, decorators, LoggerLevelSetterMixin
 
 
 class TaskStatus:
@@ -194,7 +197,7 @@ class SqlaQueue(LoggerMixin, LoggerLevelSetterMixin):
             if is_delete_the_task:
                 sqla_task = ss.query(self.SqlaQueueModel).filter_by(job_id=sqla_task_dict['job_id']).first()
                 # print(sqla_task)
-                if sqla_task:   # REMIND 如果中途把表清空了，则不会查找到。
+                if sqla_task:  # REMIND 如果中途把表清空了，则不会查找到。
                     ss.delete(sqla_task)
             else:
                 sqla_task = ss.query(self.SqlaQueueModel).filter(self.SqlaQueueModel.job_id == sqla_task_dict['job_id']).first()

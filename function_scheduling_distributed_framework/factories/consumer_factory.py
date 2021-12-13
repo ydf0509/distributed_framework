@@ -23,6 +23,7 @@ from function_scheduling_distributed_framework.consumers.rocketmq_consumer impor
 from function_scheduling_distributed_framework.consumers.sqlachemy_consumer import SqlachemyConsumer
 from function_scheduling_distributed_framework.consumers.redis_stream_consumer import RedisStreamConsumer
 from function_scheduling_distributed_framework.consumers.tcp_consumer import TCPConsumer
+from function_scheduling_distributed_framework.consumers.txt_file_consumer import TxtFileConsumer
 from function_scheduling_distributed_framework.consumers.udp_consumer import UDPConsumer
 from function_scheduling_distributed_framework.consumers.zeromq_consumer import ZeroMqConsumer
 from function_scheduling_distributed_framework.consumers.mqtt_consumer import MqttConsumer
@@ -62,6 +63,7 @@ def get_consumer(*args, broker_kind: int = None, **kwargs):
         22: TCPConsumer,
         23: HTTPConsumer,
         24: NatsConsumer,
+        25:TxtFileConsumer,
     }
     if broker_kind is None:
         broker_kind = frame_config.DEFAULT_BROKER_KIND

@@ -22,7 +22,11 @@ from function_scheduling_distributed_framework import frame_config
 from function_scheduling_distributed_framework.concurrent_pool import CustomThreadPoolExecutor
 
 
-class RedisAsyncResult(RedisMixin):
+class HasNotAsyncResult(Exception):
+    pass
+
+
+class AsyncResult(RedisMixin):
     callback_run_executor = CustomThreadPoolExecutor(200)
 
     def __init__(self, task_id, timeout=120):
@@ -36,17 +40,28 @@ class RedisAsyncResult(RedisMixin):
         return self
 
     def is_pending(self):
-        return self.redis_db_frame.exists(self.task_id)
+        return not self.redis_db_frame.exists(self.task_id)
 
     @property
     def status_and_result(self):
         if not self._has_pop:
-            self._status_and_result = json.loads(self.redis_db_frame.blpop(self.task_id, self.timeout)[1])
+            redis_value = self.redis_db_frame.blpop(self.task_id, self.timeout)
             self._has_pop = True
+            if redis_value is not None:
+                status_and_result_str = redis_value[1]
+                self._status_and_result = json.loads(status_and_result_str)
+                self.redis_db_frame.lpush(self.task_id, status_and_result_str)
+                self.redis_db_frame.expire(self.task_id, 600)
+                return self._status_and_result
+            return None
         return self._status_and_result
 
     def get(self):
-        return self.status_and_result['result']
+        # print(self.status_and_result)
+        if self.status_and_result is not None:
+            return self.status_and_result['result']
+        else:
+            raise HasNotAsyncResult
 
     @property
     def result(self):
@@ -78,6 +93,9 @@ class RedisAsyncResult(RedisMixin):
             async_result.set_callback(show_result) # 使用回调函数在线程池中并发的运行函数结果
         '''
         self.callback_run_executor.submit(self._run_callback_func, callback_func)
+
+
+RedisAsyncResult = AsyncResult  # 别名
 
 
 class PriorityConsumingControlConfig:
@@ -178,16 +196,17 @@ class AbstractPublisher(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
 
     def __init__(self, queue_name, log_level_int=10, logger_prefix='', is_add_file_handler=True,
                  clear_queue_within_init=False, is_add_publish_time=True, consuming_function: callable = None, ):
+        # noinspection GrazieInspection
         """
-        :param queue_name:
-        :param log_level_int:
-        :param logger_prefix:
-        :param is_add_file_handler:
-        :param clear_queue_within_init:
-        :param is_add_publish_time:是否添加发布时间，以后废弃，都添加。
-        :param consuming_function:消费函数，为了做发布时候的函数入参校验用的，如果不传则不做发布任务的校验，
-               例如add 函数接收x，y入参，你推送{"x":1,"z":3}就是不正确的，函数不接受z参数。
-        """
+                :param queue_name:
+                :param log_level_int:
+                :param logger_prefix:
+                :param is_add_file_handler:
+                :param clear_queue_within_init:
+                :param is_add_publish_time:是否添加发布时间，以后废弃，都添加。
+                :param consuming_function:消费函数，为了做发布时候的函数入参校验用的，如果不传则不做发布任务的校验，
+                       例如add 函数接收x，y入参，你推送{"x":1,"z":3}就是不正确的，函数不接受z参数。
+                """
         self.queue_name = self._queue_name = queue_name
         if logger_prefix != '':
             logger_prefix += '--'

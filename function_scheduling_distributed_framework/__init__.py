@@ -11,7 +11,8 @@ from function_scheduling_distributed_framework.consumers.base_consumer import (E
                                                                                AbstractConsumer, ConsumersManager,
                                                                                FunctionResultStatusPersistanceConfig,
                                                                                wait_for_possible_has_finish_all_tasks_by_conusmer_list)
-from function_scheduling_distributed_framework.publishers.base_publisher import PriorityConsumingControlConfig, AbstractPublisher
+from function_scheduling_distributed_framework.publishers.base_publisher import (PriorityConsumingControlConfig,
+                                                                                 AbstractPublisher,AsyncResult,HasNotAsyncResult)
 from function_scheduling_distributed_framework.factories.publisher_factotry import get_publisher
 from function_scheduling_distributed_framework.factories.consumer_factory import get_consumer
 
