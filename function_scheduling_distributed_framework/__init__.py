@@ -127,6 +127,7 @@ def task_deco(queue_name, *, function_timeout=0,
               function_result_status_persistance_conf=FunctionResultStatusPersistanceConfig(False, False, 7 * 24 * 3600),
               is_using_rpc_mode=False,
               broker_kind: int = None):
+
     """
     # 为了代码提示好，这里重复一次入参意义。被此装饰器装饰的函数f，函数f对象本身自动加了一些方法，例如f.push 、 f.consume等。
     :param queue_name: 队列名字。
@@ -136,10 +137,11 @@ def task_deco(queue_name, *, function_timeout=0,
     :param concurrent_num:并发数量
     :param specify_concurrent_pool:使用指定的线程池（协程池），可以多个消费者共使用一个线程池，不为None时候。threads_num失效
     :param specify_async_loop:指定的async的loop循环，设置并发模式为async才能起作用。
-    :param concurrent_mode:并发模式，1线程 2gevent 3eventlet 4 asyncio
+    :param concurrent_mode:并发模式，1线程(ConcurrentModeEnum.THREADING) 2gevent(ConcurrentModeEnum.GEVENT)
+                              3eventlet(ConcurrentModeEnum.EVENTLET) 4 asyncio(ConcurrentModeEnum.ASYNC) 5单线程(ConcurrentModeEnum.SINGLE_THREAD)
     :param max_retry_times: 最大自动重试次数，当函数发生错误，立即自动重试运行n次，对一些特殊不稳定情况会有效果。
            可以在函数中主动抛出重试的异常ExceptionForRetry，框架也会立即自动重试。
-           主动抛出ExceptionForRequeue异常，则当前消息会重返中间件。
+           主动抛出ExceptionForRequeue异常，则当前 消息会重返中间件。
     :param log_level:框架的日志级别。logging.DEBUG(10)  logging.DEBUG(10) logging.INFO(20) logging.WARNING(30) logging.ERROR(40) logging.CRITICAL(50)
     :param is_print_detail_exception:是否打印详细的堆栈错误。为0则打印简略的错误占用控制台屏幕行数少。
     :param is_show_message_get_from_broker: 从中间件取出消息时候时候打印显示出来
@@ -160,10 +162,7 @@ def task_deco(queue_name, *, function_timeout=0,
     :param function_result_status_persistance_conf   :配置。是否保存函数的入参，运行结果和运行状态到mongodb。
            这一步用于后续的参数追溯，任务统计和web展示，需要安装mongo。
     :param is_using_rpc_mode 是否使用rpc模式，可以在发布端获取消费端的结果回调，但消耗一定性能，使用async_result.result时候会等待阻塞住当前线程。。
-    :param broker_kind:中间件种类,。 0 使用pika链接rabbitmqmq，1使用rabbitpy包实现的操作rabbitmnq，2使用redis，
-           3使用python内置Queue,4使用amqpstorm包实现的操作rabbitmq，5使用mongo，6使用本机磁盘持久化。
-           7使用nsq，8使用kafka，9也是使用redis但支持消费确认。10为sqlachemy，支持mysql sqlite postgre oracel sqlserver
-           11使用rocketmq. 12 使用 redis 的 stream 数据结构，这个也能支持消费确认。
+    :param broker_kind:中间件种类，支持30种消息队列。 入参见 BrokerEnum枚举类的属性。
     """
 
     """

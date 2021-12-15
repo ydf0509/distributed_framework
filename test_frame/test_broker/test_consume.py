@@ -11,7 +11,7 @@ from function_scheduling_distributed_framework.utils import RedisMixin
 
 # @task_deco('test_queue66', broker_kind=BrokerEnum.RABBITMQ_AMQPSTORM, qps=5, log_level=10, is_print_detail_exception=False, is_show_message_get_from_broker=False,
 #            is_using_distributed_frequency_control=True)
-@task_deco('test_queue70c', qps=30,broker_kind=BrokerEnum.TXT_FILE,)
+@task_deco('test_queue70c', qps=30,broker_kind=BrokerEnum.KOMBU,)
 def f(x,y):
     return x+y
 

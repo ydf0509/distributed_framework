@@ -9,7 +9,7 @@ http://www.5442tu.com/mingxing/list_2_1.html  下载所有明星图片
 """
 
 
-@task_deco('xiaoxianrou_list_page', qps=0.2)
+@task_deco('xiaoxianrou_list_page', qps=0.05)
 def cralw_list_page(page_index):
     url = f'http://www.5442tu.com/mingxing/list_2_{page_index}.html'
     resp = requests.get(url)
@@ -19,8 +19,8 @@ def cralw_list_page(page_index):
         crawl_detail_page.push(detail_sel.xpath('./@href').extract_first(), detail_sel.xpath('./@title').extract_first(), 1, is_first_picture=True)
 
 
-@task_deco('xiaoxianrou_detail_page', qps=0.1)
-def crawl_detail_page(url, title, picture_index, is_first_picture=False):
+@task_deco('xiaoxianrou_detail_page', qps=2,do_task_filtering=True)
+def crawl_detail_page(url, title, picture_index, is_first_picture=False,):
     resp = requests.get(url)
     sel = Selector(resp.content.decode('gbk'))
     if is_first_picture:  # 详情页图册也需要翻页。

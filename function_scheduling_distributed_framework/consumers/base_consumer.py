@@ -267,6 +267,8 @@ class ConsumersManager:
             return 'evenlet'
         elif concurrent_mode == 4:
             return 'async'
+        elif concurrent_mode == 5:
+            return 'single_thread'
 
 
 # noinspection DuplicatedCode
@@ -310,6 +312,7 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
                  function_result_status_persistance_conf=FunctionResultStatusPersistanceConfig(
                      False, False, 7 * 24 * 3600),
                  is_using_rpc_mode=False):
+
         """
         :param queue_name:
         :param consuming_function: 处理消息的函数。
@@ -319,7 +322,8 @@ class AbstractConsumer(LoggerLevelSetterMixin, metaclass=abc.ABCMeta, ):
         :param concurrent_num:并发数量，并发种类由concurrent_mode决定
         :param specify_concurrent_pool:使用指定的线程池/携程池，可以多个消费者共使用一个线程池，不为None时候。threads_num失效
         :param specify_async_loop:指定的async的loop循环，设置并发模式为async才能起作用。
-        :param concurrent_mode:并发模式，1线程 2gevent 3eventlet 4 asyncio
+        :param concurrent_mode:并发模式，1线程(ConcurrentModeEnum.THREADING) 2gevent(ConcurrentModeEnum.GEVENT)
+                              3eventlet(ConcurrentModeEnum.EVENTLET) 4 asyncio(ConcurrentModeEnum.ASYNC) 5单线程(ConcurrentModeEnum.SINGLE_THREAD)
         :param max_retry_times:
         :param log_level: # 这里是设置消费者 发布者日志级别的，如果不想看到很多的细节显示信息，可以设置为 20 (logging.INFO)。
         :param is_print_detail_exception:函数出错时候时候显示详细的错误堆栈，占用屏幕太多

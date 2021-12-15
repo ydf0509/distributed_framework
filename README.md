@@ -23,7 +23,7 @@
 
 [//]: # (现在新建一个qq群 189603256)
 
-[comment]: <> ([点击加入 python万能分布式函数调度框架qq群]&#40;https://qm.qq.com/cgi-bin/qm/qr?k=unA_o_L3sv5yushJzYGUTAwSzZ7GhUhq&jump_from=webapi&#41;)
+[//]:# ([点击加入 python万能分布式函数调度框架qq群]&#40;https://qm.qq.com/cgi-bin/qm/qr?k=unA_o_L3sv5yushJzYGUTAwSzZ7GhUhq&jump_from=webapi&#41;)
 
 
 ## 1.1 安装方式
@@ -39,7 +39,7 @@ pip install function_scheduling_distributed_framework --upgrade
 
 有了这个框架，用户再也无需亲自手写操作进程、线程、协程的并发的代码了。
 
-有了这个框架，用户再也无需亲自手写操作redis rabbitmq socket kafka 了 。
+有了这个框架，用户再也无需亲自手写操作redis rabbitmq socket kafka 了。
 
 [![sgV2xP.png](https://z3.ax1x.com/2021/01/19/sgV2xP.png)](https://imgtu.com/i/sgV2xP)
 
@@ -108,7 +108,7 @@ python通用分布式函数调度框架。适用场景范围广泛， 框架非�
         支持数十种最负盛名的消息中间件.(除了常规mq，还包括用不同形式的如 数据库 磁盘文件 redis等来模拟消息队列)
 
      并发：
-        支持threading gevent eventlet asyncio 四种并发模式 叠加 多进程。
+        支持threading gevent eventlet asyncio 单线程 5种并发模式 叠加 多进程。
         多进程不是和前面四种模式平行的，是叠加的，例如可以是 多进程 + 协程，多进程 + 多线程。
      
      控频限流：
