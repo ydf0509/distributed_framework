@@ -3,6 +3,10 @@
 from function_scheduling_distributed_framework.constant import BrokerEnum
 
 '''
+此文件是第一次运行框架自动生成刀项目根目录的，不需要用由户手动创建。
+'''
+
+'''
 1）你项目根目录下自动生成的 distributed_frame_config.py 文件中修改配置，会被自动读取到。
 此文件按需修改，例如你使用redis中间件作为消息队列，可以不用管rabbitmq的配置。
 
