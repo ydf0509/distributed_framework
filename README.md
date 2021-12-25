@@ -1,3 +1,28 @@
+# 0. 此项目迁移到 funboost 框架
+
+此项目改名为新的funboost，新旧框架的代码和功能完全一模一样，只是框架的名字做了变化。
+以后停止更新此项目代码，使用funboost。
+
+<p style="color: crimson;font-size: larger">funboost框架取名说明:</p>
+<pre style="color: darkorchid ;font-size:medium">
+funboost是function_scheduling_distributed_framework框架的新名字,把框架名字长度减小.
+funboost名字是两个单词,fun是function指的是python函数,boost是加速的意思,合一起是加速函数并发运行.
+</pre>
+
+<p style="color: crimson;font-size: larger">两个框架的兼容性说明:</p>
+<pre style="color: darkorchid;font-size:medium">
+funboost 和 function_scheduling_distributed_framework 项目的代码一模一样,以后新代码只更新funboost项目。
+from funboost import xx 和  from function_scheduling_distributed_framework import xx 是完全一模一样的.
+boost是task_deco的别名，两个都可以使用。在消费函数上写@boost 和 @task_deco是一模一样的，两个都可以使用。
+所以在有的文档或者截图中如果写 
+from  function_scheduling_distributed_framework import task_deco , @task_deco
+用户需要知道效果和from funboost import boost , @boost 是一模一样的。
+</pre>
+
+<span style="font-size:20px">新框架地址：<span><a href="https://github.com/ydf0509/funboost" style="font-size: 25px">funboost框架地址链接</a>
+
+
+
 # 1.分布式函数调度框架简介
 
 ## 1.0 github地址和文档地址

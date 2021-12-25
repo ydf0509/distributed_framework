@@ -58,10 +58,10 @@ python比其他语言更需要分布式函数调度框架来执行函数，有�
 
 ```python
 import time
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco("task_queue_name1", qps=5, broker_kind=BrokerEnum.PERSISTQUEUE)  # 入参包括20种，运行控制方式非常多，想得到的控制都会有。
+@boost("task_queue_name1", qps=5, broker_kind=BrokerEnum.PERSISTQUEUE)  # 入参包括20种，运行控制方式非常多，想得到的控制都会有。
 def task_fun(x, y):
     print(f'{x} + {y} = {x + y}')
     time.sleep(3)  # 框架会自动并发绕开这个阻塞，无论函数内部随机耗时多久都能自动调节并发达到每秒运行 5 次 这个 task_fun 函数的目的。
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 对于消费函数，框架内部会生成发布者(生产者)和消费者。
 1.推送。 task_fun.push(1,y=2) 会把 {"x":1,"y":2} (消息也自动包含一些其他辅助信息) 发送到中间件的 task_queue_name1 队列中。
 2.消费。 task_fun.consume() 开始自动从中间件拉取消息，并发的调度运行函数，task_fun(**{"x":1,"y":2}),每秒运行5次
-整个过程只有这两步，清晰明了，其他的控制方式需要看 task_deco 的中文入参解释，全都参数都很有用。
+整个过程只有这两步，清晰明了，其他的控制方式需要看 boost 的中文入参解释，全都参数都很有用。
  
 
 这个是单个脚本实现了发布和消费，一般都是分离成两个文件的，任务发布和任务消费无需在同一个进程的解释器内部，
@@ -291,10 +291,10 @@ REDIS 是至多消费一次。
    框架不鼓励用户定义异步函数，你就用同步的直观方式思维定义函数就行了，其余的并发调度交给框架就行了。
 5、开启多进程启动多个consumer，此模式是 多进程  + 上面4种的其中一种并发方式，充分利用多核和充分利用io，用法如下。可以实现 多进程 叠加 协程并发。
 # 这种是多进程方式，一次编写能够兼容win和linux的运行。
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum, run_consumer_with_multi_process
+from function_scheduling_distributed_framework import boost, BrokerEnum, ConcurrentModeEnum, run_consumer_with_multi_process
 import os
 
-@task_deco('test_multi_process_queue',broker_kind=BrokerEnum.REDIS_ACK_ABLE,
+@boost('test_multi_process_queue',broker_kind=BrokerEnum.REDIS_ACK_ABLE,
            concurrent_mode=ConcurrentModeEnum.THREADING,)
 def fff(x):
     print(x * 10,os.getpid())
@@ -502,10 +502,10 @@ consumer.start_consuming_message()
 
 # 装饰器版，使用方式例如：
 
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('queue_test_f01', qps=0.2, broker_kind=BrokerEnum.REDIS_ACK_ABLE)  # qps 0.2表示每5秒运行一次函数，broker_kind=2表示使用redis作中间件。
+@boost('queue_test_f01', qps=0.2, broker_kind=BrokerEnum.REDIS_ACK_ABLE)  # qps 0.2表示每5秒运行一次函数，broker_kind=2表示使用redis作中间件。
 def add(a, b):
     print(a + b)
 
@@ -534,7 +534,7 @@ consumer.start_consuming_message()  # 使用consumer.start_consuming_message 消
 ```
 
 ```
-装饰器版本的 task_deco 入参 和 get_consumer 入参99%一致，唯一不同的是 装饰器版本加在了函数上自动知道消费函数了，
+装饰器版本的 boost 入参 和 get_consumer 入参99%一致，唯一不同的是 装饰器版本加在了函数上自动知道消费函数了，
 所以不需要传consuming_function参数。
 ```
 
@@ -547,10 +547,10 @@ qps规定了step1每2秒执行一次，step2每秒执行3次。
 ```python
 import time
 
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('queue_test_step1', qps=0.5, broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
+@boost('queue_test_step1', qps=0.5, broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
 def step1(x):
     print(f'x 的值是 {x}')
     if x == 0:
@@ -561,7 +561,7 @@ def step1(x):
     time.sleep(10)
 
 
-@task_deco('queue_test_step2', qps=3, broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
+@boost('queue_test_step2', qps=3, broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
 def step2(y):
     print(f'y 的值是 {y}')
     time.sleep(10)
@@ -581,10 +581,10 @@ if __name__ == '__main__':
 ```python
 # 定时运行消费演示，定时方式入参用法可以百度 apscheduler 定时包。
 import datetime
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, fsdf_background_scheduler, timing_publish_deco
+from function_scheduling_distributed_framework import boost, BrokerEnum, fsdf_background_scheduler, timing_publish_deco
 
 
-@task_deco('queue_test_666', broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
+@boost('queue_test_666', broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
 def consume_func(x, y):
     print(f'{x} + {y} = {x + y}')
 
@@ -612,7 +612,7 @@ ff.multi_process_start(2)  就是代表启动2个独立进程并发 + 叠加 asy
 
 ```python 
 import time
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, IdeAutoCompleteHelper, PriorityConsumingControlConfig, run_consumer_with_multi_process
+from function_scheduling_distributed_framework import boost, BrokerEnum, IdeAutoCompleteHelper, PriorityConsumingControlConfig, run_consumer_with_multi_process
 
 """
 演示多进程启动消费，多进程和 asyncio/threading/gevnt/evntlet是叠加关系，不是平行的关系。
@@ -621,7 +621,7 @@ from function_scheduling_distributed_framework import task_deco, BrokerEnum, Ide
 
 # qps=5，is_using_distributed_frequency_control=True 分布式控频每秒执行5次。
 # 如果is_using_distributed_frequency_control不设置为True,默认每个进程都会每秒执行5次。
-@task_deco('test_queue', broker_kind=BrokerEnum.REDIS, qps=5, is_using_distributed_frequency_control=True)
+@boost('test_queue', broker_kind=BrokerEnum.REDIS, qps=5, is_using_distributed_frequency_control=True)
 def ff(x, y):
     import os
     time.sleep(2)
@@ -651,10 +651,10 @@ if __name__ == '__main__':
 ##### 远程服务端脚本，执行求和逻辑。 test_frame\test_rpc\test_consume.py
 
 ```python
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('test_rpc_queue', is_using_rpc_mode=True, broker_kind=BrokerEnum.REDIS_ACK_ABLE)
+@boost('test_rpc_queue', is_using_rpc_mode=True, broker_kind=BrokerEnum.REDIS_ACK_ABLE)
 def add(a, b):
     return a + b
 
@@ -694,12 +694,12 @@ for i in range(100):
 ```python
 import time
 import threading
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum, ConcurrentModeEnum
 
 t_start = time.time()
 
 
-@task_deco('queue_test2_qps', qps=2, broker_kind=BrokerEnum.PERSISTQUEUE, concurrent_mode=ConcurrentModeEnum.THREADING, concurrent_num=600)
+@boost('queue_test2_qps', qps=2, broker_kind=BrokerEnum.PERSISTQUEUE, concurrent_mode=ConcurrentModeEnum.THREADING, concurrent_num=600)
 def f2(a, b):
     """
     这个例子是测试函数耗时是动态变化的，这样就不可能通过提前设置参数预估函数固定耗时和搞鬼了。看看能不能实现qps稳定和线程池自动扩大自动缩小
@@ -743,10 +743,10 @@ if __name__ == '__main__':
 ```python
 import time
 import random
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, run_consumer_with_multi_process
+from function_scheduling_distributed_framework import boost, BrokerEnum, run_consumer_with_multi_process
 
 
-@task_deco('test_rabbit_queue7', broker_kind=BrokerEnum.RABBITMQ_AMQPSTORM, qps=100, log_level=20)
+@boost('test_rabbit_queue7', broker_kind=BrokerEnum.RABBITMQ_AMQPSTORM, qps=100, log_level=20)
 def test_fun(x):
     # time.sleep(2.9)
     # sleep时间随机从0.1毫秒到5秒任意徘徊。传统的恒定并发数量的线程池对未知的耗时任务，持续100次每秒的精确控频无能为力。
@@ -792,7 +792,7 @@ if __name__ == '__main__':
 ```python
   # 此框架精确控频率精确度达到99.9%，celery控频相当不准确，最多到达60%左右，两框架同样是做简单的加法然后sleep0.7秒，都设置500并发。
   
-      @task_deco('test_queue66', broker_kind=BrokerEnum.REDIS, qps=100)
+      @boost('test_queue66', broker_kind=BrokerEnum.REDIS, qps=100)
       def f(x, y):
         print(f''' {int(time.time())} 计算  {x} + {y} = {x + y}''')
         time.sleep(0.7)
@@ -845,10 +845,10 @@ eta传一个datetime对象表示，精确的运行时间运行一次。
 ##### 消费，消费代码没有任何变化
 
 ```python
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('test_delay', broker_kind=BrokerEnum.REDIS_ACK_ABLE)
+@boost('test_delay', broker_kind=BrokerEnum.REDIS_ACK_ABLE)
 def f(x):
     print(x)
 
@@ -1281,10 +1281,10 @@ FsdfBackgroundScheduler继承自 apscheduler 的 BackgroundScheduler，定时方
 
 ```python
 import datetime
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, fsdf_background_scheduler, timing_publish_deco
+from function_scheduling_distributed_framework import boost, BrokerEnum, fsdf_background_scheduler, timing_publish_deco
 
 
-@task_deco('queue_test_666', broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
+@boost('queue_test_666', broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE)
 def consume_func(x, y):
     print(f'{x} + {y} = {x + y}')
 
@@ -1464,7 +1464,7 @@ from within them. This way, you will have FULL control over Analytics object wit
 如你所见，使用此框架为什么没有配置中间件的 账号 密码 端口号呢。只有运行任何一个导入了框架的脚本文件一次，就会自动生成一个配置文件
 然后在配置文件中按需修改需要用到的配置就行。
 
-@task_deco 和celery的 @app.task 装饰器区别很大，导致写代码方便简化容易很多。没有需要先实例化一个 Celery对象一般叫app变量，
+@boost 和celery的 @app.task 装饰器区别很大，导致写代码方便简化容易很多。没有需要先实例化一个 Celery对象一般叫app变量，
 然后任何脚本的消费函数都再需要导入这个app，然后@app.task，一点小区别，但造成的两种框架写法难易程度区别很大。
 使用此框架，不需要固定的项目文件夹目录，任意多层级深层级文件夹不规则python文件名字下写函数都行，
 celery 实际也可以不规则文件夹和文件名字来写任务函数，但是很难掌握，如果这么写的话，那么在任务注册时候会非常难，
@@ -1788,10 +1788,10 @@ start_consuming_message('test_beggar_redis_consumer_queue', consume_function=add
 装饰器版，使用方式例如：
 
 ```python
-from function_scheduling_distributed_framework import task_deco
+from function_scheduling_distributed_framework import boost
 
 
-@task_deco('queue_test_f01', qps=0.2, broker_kind=2)
+@boost('queue_test_f01', qps=0.2, broker_kind=2)
 def add(a, b):
     print(a + b)
 
@@ -1819,17 +1819,17 @@ for i in range(10, 20):
 consumer.start_consuming_message()
 ```
 
-装饰器版本的 task_deco 入参 和 get_consumer 入参99%一致，唯一不同的是 装饰器版本加在了函数上自动知道消费函数了，
+装饰器版本的 boost 入参 和 get_consumer 入参99%一致，唯一不同的是 装饰器版本加在了函数上自动知道消费函数了，
 
 所以不需要传consuming_function参数。
 
 ## 6.12 增加rocketmq支持。 (2020-7)
 
 ```python
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('queue_test_f03', qps=2, broker_kind=BrokerEnum.ROCKETMQ)
+@boost('queue_test_f03', qps=2, broker_kind=BrokerEnum.ROCKETMQ)
 def f(a, b):
     print(f'{a} + {b} = {a + b}')
 
@@ -1854,12 +1854,12 @@ if __name__ == '__main__':
 
 ```python
 
-from function_scheduling_distributed_framework import task_deco, BrokerEnum, ConcurrentModeEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum, ConcurrentModeEnum
 import asyncio
 
 
 # 此段代码使用的是语言级Queue队列，不需要安装中间件，可以直接复制运行测试。
-@task_deco('test_async_queue2', concurrent_mode=ConcurrentModeEnum.ASYNC,
+@boost('test_async_queue2', concurrent_mode=ConcurrentModeEnum.ASYNC,
            broker_kind=BrokerEnum.LOCAL_PYTHON_QUEUE, concurrent_num=500, qps=20)
 async def async_f(x):
     # 测试异步阻塞并发， 此处不能写成time.sleep(1),否则无论设置多高的并发，1秒钟最多只能运行1次函数。
@@ -1940,10 +1940,10 @@ BrokerEnum.REDIS 中间件 不支持消费确认，随意重启或者断电断�
 ```
 
 ```python
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('queue_test_f01', broker_kind=BrokerEnum.REDIS_STREAM, )
+@boost('queue_test_f01', broker_kind=BrokerEnum.REDIS_STREAM, )
 def f(a, b):
     print(f'{a} + {b} = {a + b}')
 
@@ -1960,7 +1960,7 @@ if __name__ == '__main__':
 
 ```
 代码演示省略，设置broker_kind=BrokerEnum.RedisBrpopLpush就行了。 
-@task_deco('queue_test_f01', broker_kind=BrokerEnum.RedisBrpopLpush,)
+@boost('queue_test_f01', broker_kind=BrokerEnum.RedisBrpopLpush,)
 ```
 
 ## 6.16 2021-04 新增以 zeromq 为中间件的消息队列。
@@ -1974,10 +1974,10 @@ zeromq方式是启动一个端口，所以queue_name传一个大于20000小于65
 
 ```python
 import time
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('30778', broker_kind=BrokerEnum.ZEROMQ, qps=2)
+@boost('30778', broker_kind=BrokerEnum.ZEROMQ, qps=2)
 def f(x):
     time.sleep(1)
     print(x)
@@ -2001,7 +2001,7 @@ for i in range(100):
 
 ```
 一次性新增操作10种消息队列,.但比较知名的例如rabbitmq redis sqlite3 函数调度框架已经在之前实现了。
-使用方式为设置 @task_deco 装饰器的 broker_kind 为 BrokerEnum.KOMBU
+使用方式为设置 @boost 装饰器的 broker_kind 为 BrokerEnum.KOMBU
 在你项目根目录下的 distributed_frame_config.py  文件中设置 
 KOMBU_URL = 'redis://127.0.0.1:6379/7' 那么就是使用komb 操作redis。
 KOMBU_URL = 'amqp://username:password@127.0.0.1:5672/',那么就是操纵rabbitmq
@@ -2030,10 +2030,10 @@ celery 执行 print hello 这样的最简单任务，单核单进程每秒执行
 
 ```python
 import time
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('test_kombu2', broker_kind=BrokerEnum.KOMBU, qps=5, )
+@boost('test_kombu2', broker_kind=BrokerEnum.KOMBU, qps=5, )
 def f(x):
     time.sleep(60)
     print(x)
@@ -2065,10 +2065,10 @@ KOMBU_URL = 'redis://127.0.0.1:6379/7'
 ###### 例子，设置 broker_kind=BrokerEnum.MQTT
 
 ```python
-from function_scheduling_distributed_framework import task_deco, BrokerEnum
+from function_scheduling_distributed_framework import boost, BrokerEnum
 
 
-@task_deco('mqtt_topic_test', broker_kind=BrokerEnum.MQTT)
+@boost('mqtt_topic_test', broker_kind=BrokerEnum.MQTT)
 def f(x, y):
     print(f''' {x} + {y} = {x + y}''')
     return x + y
@@ -2095,13 +2095,13 @@ f.consume()
 ## 6.19 2021-04 新增以 httpsqs 作为消息中间件
 
 ```
-@task_deco('httpsqs_queue_test',broker_kind=BrokerEnum.HTTPSQS)
+@boost('httpsqs_queue_test',broker_kind=BrokerEnum.HTTPSQS)
 ```
 
 ## 6.20 2021-04 新增支持下一代分布式消息系统 pulsar 。
 
 ```
-@task_deco('httpsqs_queue_test',broker_kind=BrokerEnum.PULSAR)
+@boost('httpsqs_queue_test',broker_kind=BrokerEnum.PULSAR)
 
 使用此中间件，代码必须在linux mac上运行。
 
