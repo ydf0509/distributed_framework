@@ -241,3 +241,5 @@ def task_deco(queue_name, *, function_timeout=0,
         # return update_wrapper(__deco, func)
 
     return _deco  # noqa
+
+boost = task_deco # 两个装饰器名字都可以。task_deco是原来名字，boost是新名字，兼容一下。
