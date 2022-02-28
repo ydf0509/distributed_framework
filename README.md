@@ -2,7 +2,7 @@
 <span style="font-size:20px">此项目迁移到新框架funboost地址：<span><a href="https://github.com/ydf0509/funboost" style="font-size: 25px">funboost框架地址链接</a>
 
 此项目改名为新的funboost，新旧框架的代码和功能完全一模一样，只是框架的名字做了变化。
-以后停止更新此项目代码，使用funboost。
+以后停止更新此项目代码，使用funboost     
 
 <p style="color: crimson;font-size: larger">funboost框架取名说明:</p>
 <pre style="color: darkorchid ;font-size:medium">
