@@ -24,7 +24,7 @@ from  function_scheduling_distributed_framework import task_deco , @task_deco
 
 
 
-# 1.分布式函数调度框架简介
+# 1.分布式函数调度框架简介。
 
 ## 1.0 github地址和文档地址
 
