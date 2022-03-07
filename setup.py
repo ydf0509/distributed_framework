@@ -4,10 +4,10 @@ from setuptools import setup, find_packages
 
 # with open("README.md", "r",encoding='utf8') as fh:
 #     long_description = fh.read()
-
+print(find_packages())
 setup(
     name='function_scheduling_distributed_framework',  #
-    version='12.8',
+    version='12.9',
     description=(
         'function scheduling distributed framework,support threading,gevent,eventlet,asyncio concurrent,support all kinds of message queue,and has manay control way'
     ),
@@ -79,6 +79,8 @@ setup(
         'fabric2==2.6.0',  # 有的机器包rust错误， 这样做 curl https://sh.rustup.rs -sSf | sh
         'nats-python',
         'nb_filelock',
+        'aiohttp',
+        'pysnooper',
     ]
 )
 """
@@ -92,7 +94,7 @@ setup(
 python setup.py sdist upload -r pypi
 
 # python setup.py bdist_wheel
-python setup.py bdist_wheel ; python -m twine upload dist/function_scheduling_distributed_framework-12.8-py3-none-any.whl
+python setup.py bdist_wheel ; python -m twine upload dist/function_scheduling_distributed_framework-12.9-py3-none-any.whl
 python setup.py sdist & twine upload dist/function_scheduling_distributed_framework-10.9.tar.gz
 
 最快的下载方式，上传立即可安装。阿里云源同步官网pypi间隔要等很久。
