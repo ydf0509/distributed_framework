@@ -42,7 +42,7 @@ setup(
     ],
     install_requires=[
         'eventlet==0.31.0',
-        'gevent==21.1.2',
+        'gevent==23.9.1',
         'pymongo==3.5.1',
         'AMQPStorm==2.7.1',
         'rabbitpy==2.0.1',
